@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+<mapper namespace="com.enjoytrip.trip.model.mapper.AttractionMapper">
+	
+	<resultMap type="attractionDto" id="attraction">
+		<result column="no" property="no"/>
+		<result column="content_id" property="contentId"/>
+		<result column="title" property="title"/>
+		<result column="content_type_id" property="contentTypeId"/>
+		<result column="area_code" property="areaCode"/>		
+		<result column="si_gun_gu_code" property="siGunGuCode"/>		
+		<result column="first_image1" property="firstImage1"/>		
+		<result column="first_image2" property="firstImage2"/>		
+		<result column="map_level" property="mapLevel"/>		
+		<result column="latitude" property="latitude"/>		
+		<result column="longitude" property="longitude"/>		
+		<result column="tel" property="tel"/>		
+		<result column="addr1" property="addr1"/>		
+		<result column="addr2" property="addr2"/>		
+		<result column="homepage" property="homepage"/>		
+		<result column="overview" property="overview"/>		
+	</resultMap>
+	
+	<select id="searchAttractionBySigungu" parameterType="String" resultMap="attraction">
+		SELECT *
+		FROM attractions
+		WHERE (area_code, si_gun_gu_code)
+		IN (SELECT s.sido_code, g.gugun_code
+			FROM sidos s, guguns g
+			WHERE s.sido_code = g.sido_code
+			AND s.sido_name = #{sidoName}
+			AND g.gugun_name = #{gugunName})
+	</select>
+	
+	<select id="searchAttractionBySigunguContentTypeName" parameterType="AttractionDto" resultMap="attraction">
+		SELECT *
+		FROM attractions
+		WHERE (area_code, si_gun_gu_code)
+		IN (SELECT s.sido_code, g.gugun_code
+			FROM sidos s, guguns g
+			WHERE s.sido_code = g.sido_code
+			AND s.sido_name = #{sidoName}
+			AND g.gugun_name = #{gugunName})
+		AND a.content_type_id = #{contentType}	
+	</select>
+	
+	<select id="searchAttraction" parameterType="AttractionDto" resultMap="attraction">
+	    SELECT *
+	    FROM attractions
+	    WHERE (area_code, si_gun_gu_code) IN (
+	        SELECT s.sido_code, g.gugun_code
+	        FROM sidos s, guguns g
+	        WHERE s.sido_code = g.sido_code
+	        AND s.sido_code = #{areaCode}
+	        AND g.gugun_code = #{siGunGuCode}
+	    )
+	    <if test="contentTypeId != 0">
+	        AND content_type_id = #{contentTypeId}
+	    </if>
+	</select>
+	
+</mapper>
