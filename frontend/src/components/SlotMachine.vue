@@ -185,17 +185,46 @@ export default {
         const sido = this.slots[0].selectedValue.id;
         const gugun = this.slots[1].selectedValue.id;
         const content = this.slots[2].selectedValue.id;
-  
+
         try {
-          const response = await axios.post("http://localhost:80/gatcha", {
+          const response = await axios.post("http://localhost:80/enjoytrip/gatcha", {
             sido,
             gugun,
             content,
+          }, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
           });
-          console.log("결과:", response.data);
-          alert(`추천 여행지: ${response.data.name}`);
+          
+          // 전체 응답 데이터 구조 확인
+          console.log("전체 응답:", response.data);
+          
+          // 응답 데이터의 세부 내용 확인
+          console.log("상태 코드:", response.data.code);
+          console.log("메시지:", response.data.message);
+          
+          // 관광지 정보 (gachaAttraction) 상세 로깅
+          console.log("관광지 정보:", {
+            contentId: response.data.contentId,
+            contentTypeId: response.data.contentTypeId,
+            title: response.data.title,
+            addr1: response.data.addr1,
+            addr2: response.data.addr2,
+            areaCode: response.data.areaCode,
+            siGunGuCode: response.data.siGunGuCode,
+            latitude: response.data.latitude,
+            longitude: response.data.longitude,
+          });
+
+          alert(`추천 여행지: ${response.data.title}`);
         } catch (error) {
           console.error("서버 요청 실패:", error);
+          if (error.response) {
+            // 서버 응답이 있는 경우
+            console.error("서버 응답 데이터:", error.response.data);
+            console.error("서버 응답 상태:", error.response.status);
+          }
         }
       },
     },

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.enjoytrip.schedule.model.mapper.ScheduleMapper">
+
+    <resultMap type="scheduleDto" id="schedule">
+        <result column="schedule_id" property="scheduleId"/>
+        <result column="user_email" property="userEmail"/>
+        <result column="schedule_name" property="scheduleName"/>
+        <result column="start_date" property="startDate"/>
+        <result column="end_date" property="endDate"/>
+        <result column="created_at" property="createdAt"/>
+    </resultMap>
+
+    <resultMap type="scheduleAttractionDto" id="scheduleAttraction">
+        <result column="title" property="title"/>
+        <result column="latitude" property="latitude"/>
+        <result column="longitude" property="longitude"/>
+        <result column="first_image1" property="firstImage1"/>
+        <result column="first_image2" property="firstImage2"/>
+        <result column="schedule_id" property="scheduleId"/>
+        <result column="sequence_order" property="sequenceOrder"/>
+    </resultMap>
+
+    <select id="listSchedule" parameterType="String" resultMap="schedule">
+        SELECT schedule_id, user_email, schedule_name, start_date, end_date, created_at
+        FROM schedules
+        WHERE user_email=#{userEmail}
+    </select>
+
+    <select id="detailSchedule" parameterType="int" resultMap="scheduleAttraction">
+        SELECT at.title, at.latitude, at.longitude, at.first_image1, at.first_image2, sa.schedule_id, sa.sequence_order
+        FROM attractions at
+        INNER JOIN schedule_attractions sa ON at.no = sa.attraction_id
+        WHERE sa.schedule_id = #{scheduleId}
+    </select>
+</mapper>

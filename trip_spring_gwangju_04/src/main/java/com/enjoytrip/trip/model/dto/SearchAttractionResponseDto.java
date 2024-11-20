@@ -11,7 +11,7 @@ import lombok.Getter;
 @Getter
 public class SearchAttractionResponseDto extends ResponseDto {
 	
-	private List<AttractionDto> attractions;
+	private final List<AttractionDto> attractions;
 
 	public SearchAttractionResponseDto(Code code, Message message, 
 			List<AttractionDto> attractions) {

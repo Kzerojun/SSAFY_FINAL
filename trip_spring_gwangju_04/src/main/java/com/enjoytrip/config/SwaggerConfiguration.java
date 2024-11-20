@@ -54,4 +54,12 @@ public class SwaggerConfiguration {
             .pathsToMatch("/user/**")
             .build();
     }
+
+    @Bean
+    public GroupedOpenApi scheduleApi() {
+        return GroupedOpenApi.builder()
+                .group("enjoytrip-schedule")
+                .pathsToMatch("/schedule/**")
+                .build();
+    }
 }
