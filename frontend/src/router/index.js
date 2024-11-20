@@ -5,6 +5,7 @@ import Board from '@/views/BoardList.vue';
 import PostDetail from "@/views/PostDetail.vue";
 import Login from "@/views/Login.vue";
 import Signup from "@/views/Signup.vue";
+import Gatcha from '@/views/Gatcha.vue';
 
 const routes = [
   {
@@ -27,6 +28,7 @@ const routes = [
   { path: '/post/:id/:tab', name: 'post-detail', component: PostDetail },
   { path: '/login', name: 'login', component: Login },
   { path: '/signup', name: 'signup', component: Signup },
+  { path: '/gatcha', name: 'gatcha', component: Gatcha},
 ];
 
 const router = createRouter({
