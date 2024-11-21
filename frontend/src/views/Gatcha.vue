@@ -5,7 +5,7 @@
 </template>
 
 <script setup>
-import SlotMachine from '@/components/SlotMachine.vue'
+import SlotMachine from '@/components/SlotMachine/SlotMachine.vue'
 </script>
 
 <style scoped>

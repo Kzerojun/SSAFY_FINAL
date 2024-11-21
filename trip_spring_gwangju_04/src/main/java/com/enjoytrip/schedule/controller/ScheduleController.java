@@ -2,10 +2,8 @@ package com.enjoytrip.schedule.controller;
 
 import com.enjoytrip.global.Code;
 import com.enjoytrip.global.Message;
-import com.enjoytrip.schedule.model.dto.DetailScheduleResponseDto;
-import com.enjoytrip.schedule.model.dto.ListScheduleResponseDto;
-import com.enjoytrip.schedule.model.dto.ScheduleAttractionDto;
-import com.enjoytrip.schedule.model.dto.ScheduleDto;
+import com.enjoytrip.global.ResponseDto;
+import com.enjoytrip.schedule.model.dto.*;
 import com.enjoytrip.schedule.model.service.ScheduleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +18,23 @@ import java.util.List;
 public class ScheduleController {
 
     private final ScheduleService scheduleService;
+
+    @PostMapping()
+    public ResponseEntity<ResponseDto> createSchedule(@RequestBody ScheduleDto scheduleDto)
+        throws SQLException {
+
+        // TODO: 토큰에서 userEmail을 가져와 세팅
+        //scheduleDto.setScheduleId();
+
+        this.scheduleService.createSchedule(scheduleDto);
+
+        ResponseDto responseDto = new ResponseDto(
+                Code.SUCCESS,
+                Message.SUCCESS
+        );
+
+        return ResponseEntity.ok(responseDto);
+    }
 
     @GetMapping()
     public ResponseEntity<ListScheduleResponseDto> listSchedule(@RequestParam String userEmail)
@@ -36,11 +51,56 @@ public class ScheduleController {
         return ResponseEntity.ok(listScheduleResponseDto);
     }
 
-    @GetMapping("{scheduleId}/detail")
-    public ResponseEntity<DetailScheduleResponseDto> detailSchedule(@PathVariable int scheduleId)
+    @PatchMapping("/{scheduleId}")
+    public ResponseEntity<ResponseDto> updateSchedule(@PathVariable int scheduleId,
+        @RequestBody ScheduleDto scheduleDto) throws SQLException {
+
+        scheduleDto.setScheduleId(scheduleId);
+        this.scheduleService.updateSchedule(scheduleDto);
+
+        ResponseDto responseDto = new ResponseDto(
+                Code.SUCCESS,
+                Message.SUCCESS
+        );
+
+        return ResponseEntity.ok(responseDto);
+    }
+
+    @DeleteMapping("/{scheduleId}")
+    public ResponseEntity<ResponseDto> deleteSchedule(@PathVariable int scheduleId)
         throws SQLException {
 
-        List<ScheduleAttractionDto> scheduleDetails = scheduleService.detailSchedule(scheduleId);
+        this.scheduleService.deleteSchedule(scheduleId);
+
+        ResponseDto responseDto = new ResponseDto(
+                Code.SUCCESS,
+                Message.SUCCESS
+        );
+
+        return ResponseEntity.ok(responseDto);
+    }
+
+    @PostMapping("/{scheduleId}/attractions")
+    public ResponseEntity<ResponseDto> createAttractionToSchedule(@PathVariable int scheduleId,
+       @RequestBody ScheduleAttractionInsertRequestDto scheduleAttractionInsertRequestDto) throws SQLException {
+
+        scheduleAttractionInsertRequestDto.setScheduleId(scheduleId);
+
+        this.scheduleService.createAttractionToSchedule(scheduleAttractionInsertRequestDto);
+
+        ResponseDto responseDto = new ResponseDto(
+                Code.SUCCESS,
+                Message.SUCCESS
+        );
+
+        return ResponseEntity.ok(responseDto);
+    }
+
+    @GetMapping("/{scheduleId}/attractions")
+    public ResponseEntity<DetailScheduleResponseDto> listScheduleAttractions(@PathVariable int scheduleId)
+        throws SQLException {
+
+        List<ScheduleAttractionDto> scheduleDetails = scheduleService.listScheduleAttractions(scheduleId);
 
         DetailScheduleResponseDto detailScheduleResponseDto = new DetailScheduleResponseDto(
                 Code.SUCCESS,
@@ -49,5 +109,33 @@ public class ScheduleController {
         );
 
         return ResponseEntity.ok(detailScheduleResponseDto);
+    }
+
+    @PatchMapping("/{scheduleId}/attractions/reorder")
+    public ResponseEntity<ResponseDto> reorderScheduleAttractions(@PathVariable int scheduleId,
+        @RequestBody ScheduleReorderRequestDto scheduleReorderRequestDto) throws SQLException {
+
+        this.scheduleService.updateAttractionOrder(scheduleId, scheduleReorderRequestDto.getAttractions());
+
+        ResponseDto responseDto = new ResponseDto(
+                Code.SUCCESS,
+                Message.SUCCESS
+        );
+
+        return ResponseEntity.ok(responseDto);
+    }
+
+    @DeleteMapping("/{scheduleId}/attractions/{scheduleAttractionId}")
+    public ResponseEntity<ResponseDto> deleteAttractionFromSchedule(@PathVariable int scheduleAttractionId)
+        throws SQLException {
+
+        this.scheduleService.deleteAttractionFromSchedule(scheduleAttractionId);
+
+        ResponseDto responseDto = new ResponseDto(
+                Code.SUCCESS,
+                Message.SUCCESS
+        );
+
+        return ResponseEntity.ok(responseDto);
     }
 }
