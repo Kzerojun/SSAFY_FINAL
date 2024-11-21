@@ -105,7 +105,7 @@ export default defineComponent({
       ],
       password: [
         { required: true, message: '비밀번호를 입력하세요!' },
-        { min: 6, message: '비밀번호는 최소 6자 이상이어야 합니다' }
+        { min: 4, message: '비밀번호는 최소 4자 이상이어야 합니다' }
       ]
     };
 
@@ -118,6 +118,9 @@ export default defineComponent({
         });
 
         if (response.status === 200) {
+
+          // TODO: 토큰 전송 후 userName 받아오기
+
           const { userName } = response.data;
           message.success(`안녕하세요, ${userName}님!`);
 

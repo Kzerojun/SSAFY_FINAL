@@ -20,7 +20,8 @@ public class GatchaController {
     private final AttractionService attractionService;
 
     @PostMapping
-    public ResponseEntity<GatchAttractionResponseDto> gatcha(@RequestBody Map<String, Integer> request) throws SQLException {
+    public ResponseEntity<GatchAttractionResponseDto> gatcha(@RequestBody Map<String, Integer> request)
+            throws SQLException {
 
         AttractionDto attractionDto = new AttractionDto();
         attractionDto.setAreaCode(request.get("sido"));
@@ -34,6 +35,9 @@ public class GatchaController {
                 Message.SUCCESS,
                 gatchaAttraction
         );
+
+        // Test
+        System.out.println("GATCHA!!: " + gatchAttractionResponseDto.getAttraction());
 
         return ResponseEntity.ok(gatchAttractionResponseDto);
     }

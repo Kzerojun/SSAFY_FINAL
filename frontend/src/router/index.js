@@ -5,9 +5,10 @@ import Board from '@/views/BoardList.vue';
 import PostDetail from "@/views/PostDetail.vue";
 import Login from "@/views/Login.vue";
 import Signup from "@/views/Signup.vue";
-import Gatcha from '@/views/Gatcha.vue';
-import Schedule from '@/views/Schedule.vue';
+import Gatcha from '@/views/Gatcha.vue';h
 import MainSearch from "@/views/Travel.vue";
+import Schedule from '@/views/ScheduleList.vue';
+import ScheduleAttraction from '@/views/ScheduleAttraction.vue';
 
 const routes = [
   {
@@ -33,6 +34,11 @@ const routes = [
   { path: '/gatcha', name: 'gatcha', component: Gatcha},
   { path: '/schedule', name: 'schedule', component: Schedule},
   {path : '/search',name :'search',component: MainSearch}
+  { path: '/schedule/:scheduleId/attractions', 
+    name: 'schedule-attractions',
+    component: ScheduleAttraction,
+    props: true,
+  },
 ];
 
 const router = createRouter({

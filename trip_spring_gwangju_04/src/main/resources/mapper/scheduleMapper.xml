@@ -23,16 +23,54 @@
         <result column="sequence_order" property="sequenceOrder"/>
     </resultMap>
 
+    <insert id="createSchedule" parameterType="scheduleDto">
+        INSERT INTO schedules(user_email, schedule_name, start_date, end_date)
+        VALUES (#{userEmail}, #{scheduleName}, #{startDate}, #{endDate})
+    </insert>
+
     <select id="listSchedule" parameterType="String" resultMap="schedule">
         SELECT schedule_id, user_email, schedule_name, start_date, end_date, created_at
         FROM schedules
         WHERE user_email=#{userEmail}
     </select>
+    
+    <update id="updateSchedule" parameterType="scheduleDto">
+        UPDATE schedules
+        SET schedule_name=#{scheduleName}, start_date=#{startDate}, end_date=#{endDate}
+        WHERE schedule_id=#{scheduleId};
+    </update>
 
-    <select id="detailSchedule" parameterType="int" resultMap="scheduleAttraction">
+    <delete id="deleteSchedule" parameterType="int">
+        DELETE FROM schedules
+        WHERE schedule_id=#{scheduleId};
+    </delete>
+
+    <select id="getMaxSequence" parameterType="int">
+        SELECT COALESCE(MAX(sequence_order), -1) AS max_sequence
+        FROM schedule_attractions
+        WHERE schedule_id = #{scheduleId};
+    </select>
+
+    <insert id="createAttractionToSchedule" parameterType="scheduleAttractionInsertRequestDto">
+        INSERT INTO schedule_attractions (schedule_id, attraction_id, sequence_order)
+        VALUES (#{scheduleId}, #{attractionId}, #{sequenceOrder});
+    </insert>
+
+    <select id="listScheduleAttractions" parameterType="int" resultMap="scheduleAttraction">
         SELECT at.title, at.latitude, at.longitude, at.first_image1, at.first_image2, sa.schedule_id, sa.sequence_order
         FROM attractions at
         INNER JOIN schedule_attractions sa ON at.no = sa.attraction_id
         WHERE sa.schedule_id = #{scheduleId}
     </select>
+
+    <update id="updateSequenceOrder">
+        UPDATE schedule_attractions
+        SET sequence_order = #{sequenceOrder}
+        WHERE schedule_attraction_id = #{scheduleAttractionId};
+    </update>
+    
+    <delete id="deleteAttractionFromSchedule" parameterType="int">
+        DELETE FROM schedule_attractions
+        WHERE schedule_attraction_id = #{scheduleAttractionId};
+    </delete>
 </mapper>
