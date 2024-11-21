@@ -204,20 +204,21 @@ export default {
           console.log("상태 코드:", response.data.code);
           console.log("메시지:", response.data.message);
           
-          // 관광지 정보 (gachaAttraction) 상세 로깅
+          // 관광지 정보 (attraction) 상세 로깅
+          const attraction = response.data.attraction;
           console.log("관광지 정보:", {
-            contentId: response.data.contentId,
-            contentTypeId: response.data.contentTypeId,
-            title: response.data.title,
-            addr1: response.data.addr1,
-            addr2: response.data.addr2,
-            areaCode: response.data.areaCode,
-            siGunGuCode: response.data.siGunGuCode,
-            latitude: response.data.latitude,
-            longitude: response.data.longitude,
+              contentId: attraction.contentId,
+              contentTypeId: attraction.contentTypeId,
+              title: attraction.title,
+              addr1: attraction.addr1,
+              addr2: attraction.addr2,
+              areaCode: attraction.areaCode,
+              siGunGuCode: attraction.siGunGuCode,
+              latitude: attraction.latitude,
+              longitude: attraction.longitude,
           });
 
-          alert(`추천 여행지: ${response.data.title}`);
+          alert(`추천 여행지: ${attraction.title}`);
         } catch (error) {
           console.error("서버 요청 실패:", error);
           if (error.response) {
