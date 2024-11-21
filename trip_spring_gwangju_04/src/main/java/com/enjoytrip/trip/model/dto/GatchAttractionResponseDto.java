@@ -16,4 +16,8 @@ public class GatchAttractionResponseDto extends ResponseDto {
         super(code, message);
         this.attraction = attraction;
     }
+
+    public AttractionDto getAttraction() {
+        return attraction;
+    }
 }

@@ -32,6 +32,12 @@ public class AttractionServiceImpl implements AttractionService {
 
 		List<AttractionDto> attractionDtos = this.searchAttraction(attractionDto);
 
+		//test code
+		for(AttractionDto attraction : attractionDtos) {
+			System.out.println(attraction);
+		}
+
+
 		if (attractionDtos == null || attractionDtos.isEmpty()) {
 			return null;
 		}

@@ -106,7 +106,7 @@ export default defineComponent({
       ],
       password: [
         { required: true, message: '비밀번호를 입력하세요!' },
-        { min: 6, message: '비밀번호는 최소 6자 이상이어야 합니다' }
+        { min: 4, message: '비밀번호는 최소 4자 이상이어야 합니다' }
       ]
     };
 
@@ -120,10 +120,10 @@ export default defineComponent({
         });
 
         if (response.status === 200) {
+
           message.success(`강원랜트에 오신거 환영합니다.`);
           authStore.setAccessToken(response.data.accessToken);
 
-          // 로그인 성공 후 메인 페이지로 리다이렉트
           setTimeout(() => {
             router.push('/');
           }, 1500);

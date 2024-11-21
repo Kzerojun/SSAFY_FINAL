@@ -31,7 +31,7 @@ export default {
       } else {
         const script = document.createElement("script");
         script.src =
-            "//dapi.kakao.com/v2/maps/sdk.js?appkey=YOUR_APP_KEY&autoload=false";
+            "//dapi.kakao.com/v2/maps/sdk.js?appkey=1cbc901d3786d37bae1d7e89a64a9427&autoload=false";
         script.onload = () => {
           kakao.maps.load(() => this.initMap()); // 지도 초기화
         };

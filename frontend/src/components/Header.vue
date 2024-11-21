@@ -39,6 +39,7 @@
       <nav class="menu">
         <span @click = "gatcha">여행 뽑기</span>
         <span @click = "schedule">일정 확인</span>
+        <span @click = "search">여행 일정 만들기</span>
         <UserMenu />
         <UserOutlined class="icon" v-if="!isLoggedIn"  @click = "login"/>
         <ClockCircleOutlined class="icon" />
@@ -78,11 +79,17 @@ const schedule = () => {
   router.push({ name : 'schedule' })
 }
 
+
+
+const search = () => {
+  router.push({ name : 'search' })
+}
 // Pinia Auth Store 사용
 const authStore = useAuthStore();
 
 // 로그인 상태 확인 (accessToken 존재 여부)
 const isLoggedIn = computed(() => authStore.accessToken !== null);
+
 
 </script>
 
