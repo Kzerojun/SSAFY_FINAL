@@ -23,7 +23,6 @@ public class AuthServiceImplement implements AuthService {
 
     @Override
     public LoginResponse login(LoginRequest request) {
-
         //TODO : Spring Security 오류
         Authentication authentication = authenticationProcessor.authenticate(request);
         String token = jwtTokenFactory.generateToken(authentication);
