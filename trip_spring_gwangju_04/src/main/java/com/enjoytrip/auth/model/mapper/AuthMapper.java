@@ -40,5 +40,5 @@ public interface AuthMapper {
      * @param email 이메일
      * @return 사용자 정보
      */
-    Optional<UserDto> getUserByEmail(@Param("email") String email);
+    Optional<UserDto> getUserByEmail(String email);
 }

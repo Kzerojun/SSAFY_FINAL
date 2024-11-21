@@ -45,7 +45,7 @@ export default {
 }
 
 .sidebar {
-  width: 60%;
+  width: 80%;
   height: 100%;
   padding: 10px;
   overflow-y: auto;
