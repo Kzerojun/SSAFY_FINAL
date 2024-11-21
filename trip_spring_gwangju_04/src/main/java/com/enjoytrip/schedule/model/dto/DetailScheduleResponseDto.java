@@ -10,11 +10,13 @@ import java.util.List;
 @Getter
 public class DetailScheduleResponseDto extends ResponseDto {
 
+    private final String scheduleName;
     private final List<ScheduleAttractionDto> scheduleAttractions;
 
-    public DetailScheduleResponseDto(Code code, Message message,
+    public DetailScheduleResponseDto(Code code, Message message, String scheduleName,
                               List<ScheduleAttractionDto> scheduleAttractions) {
         super(code, message);
+        this.scheduleName = scheduleName;
         this.scheduleAttractions = scheduleAttractions;
     }
 }

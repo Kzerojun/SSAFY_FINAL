@@ -104,13 +104,20 @@ public class ScheduleController {
     public ResponseEntity<DetailScheduleResponseDto> listScheduleAttractions(@PathVariable int scheduleId)
         throws SQLException {
 
-        List<ScheduleAttractionDto> scheduleDetails = scheduleService.listScheduleAttractions(scheduleId);
+        String scheduleName = scheduleService.getScheduleName(scheduleId);
+        List<ScheduleAttractionDto> attractions = scheduleService.listScheduleAttractions(scheduleId);
 
         DetailScheduleResponseDto detailScheduleResponseDto = new DetailScheduleResponseDto(
                 Code.SUCCESS,
                 Message.SUCCESS,
-                scheduleDetails
+                scheduleName,
+                attractions
         );
+
+        // Test Code
+        for(ScheduleAttractionDto attractionDto : attractions) {
+            System.out.println(attractionDto);
+        }
 
         return ResponseEntity.ok(detailScheduleResponseDto);
     }

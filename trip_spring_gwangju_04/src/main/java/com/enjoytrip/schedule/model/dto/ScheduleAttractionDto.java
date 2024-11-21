@@ -14,6 +14,13 @@ public class ScheduleAttractionDto {
     private double longitude;
     private String firstImage1;
     private String firstImage2;
+    private String addr1;
+    private String addr2;
     private int scheduleId;
     private int sequenceOrder;
+
+    @Override
+    public String toString() {
+        return "[" + this.getSequenceOrder() + ": " + this.getTitle() + "]";
+    }
 }

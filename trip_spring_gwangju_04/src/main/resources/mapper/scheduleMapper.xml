@@ -57,10 +57,16 @@
     </insert>
 
     <select id="listScheduleAttractions" parameterType="int" resultMap="scheduleAttraction">
-        SELECT at.title, at.latitude, at.longitude, at.first_image1, at.first_image2, sa.schedule_id, sa.sequence_order
+        SELECT at.title, at.latitude, at.longitude, at.first_image1, at.first_image2, sa.schedule_id, sa.sequence_order, at.addr1, at.addr2
         FROM attractions at
         INNER JOIN schedule_attractions sa ON at.no = sa.attraction_id
         WHERE sa.schedule_id = #{scheduleId}
+    </select>
+
+    <select id="getScheduleName" parameterType="int">
+        SELECT schedule_name
+        FROM schedules
+        WHERE schedule_id = #{scheduleId}
     </select>
 
     <update id="updateSequenceOrder">

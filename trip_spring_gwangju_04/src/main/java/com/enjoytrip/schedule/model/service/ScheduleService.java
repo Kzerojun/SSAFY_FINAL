@@ -24,6 +24,8 @@ public interface ScheduleService {
     public List<ScheduleAttractionDto> listScheduleAttractions(int scheduleId)
             throws SQLException;
 
+    public String getScheduleName(int scheduleId) throws SQLException;
+
     public void updateAttractionOrder(int scheduleId, List<AttractionOrderDto> attractions) throws SQLException;
 
     public int deleteAttractionFromSchedule(int scheduleAttractionId) throws SQLException;
