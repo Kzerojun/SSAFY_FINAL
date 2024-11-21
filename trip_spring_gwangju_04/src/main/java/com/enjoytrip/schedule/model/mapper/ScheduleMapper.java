@@ -29,6 +29,8 @@ public interface ScheduleMapper {
     public List<ScheduleAttractionDto> listScheduleAttractions(int scheduleId)
             throws SQLException;
 
+    public String getScheduleName(int scheduleId) throws SQLException;
+
     public int updateSequenceOrder(AttractionOrderDto attractionOrderDto) throws SQLException;
 
     public int deleteAttractionFromSchedule(int scheduleAttractionId) throws SQLException;

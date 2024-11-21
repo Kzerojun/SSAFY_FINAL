@@ -1,6 +1,6 @@
 <template>
     <div class="attractions-container">
-      <h1>{{ scheduleName }}의 관광지 목록</h1>
+      <h1>{{ scheduleName }}</h1>
       <div v-if="attractions.length === 0" class="empty-message">
         등록된 관광지가 없습니다.
       </div>
@@ -34,7 +34,7 @@
   const fetchAttractions = async () => {
     try {
       const response = await axios.get(`http://localhost:80/enjoytrip/schedule/${scheduleId}/attractions`);
-      attractions.value = response.data.attractions || [];
+      attractions.value = response.data.scheduleAttractions || [];
       scheduleName.value = response.data.scheduleName; // 일정 이름 저장
     } catch (error) {
       console.error('관광지 목록을 불러오는 데 실패했습니다:', error);

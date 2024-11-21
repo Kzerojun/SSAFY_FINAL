@@ -1,11 +1,7 @@
 <template>
   <div class="main-view">
     <div class="sidebar">
-
-      <DragDropSchedule
-          :schedule="schedule"
-          @update:schedule="updateSchedule"
-      />
+      <DragDropSchedule @schedule-created="handleScheduleCreated"/>
     </div>
     <div class="map-container">
       <KakaoMap />
@@ -19,23 +15,11 @@ import KakaoMap from "@/components/KakaoMap.vue";
 
 export default {
   components: { DragDropSchedule, KakaoMap },
-  data() {
-    return {
-      recommendations: [
-        { id: 1, title: "도쿄 타워", description: "랜드마크", image: "..." },
-        { id: 2, title: "시부야 스카이", description: "전망대", image: "..." },
-      ],
-      schedule: [],
-    };
-  },
   methods: {
-    handleSearch(query) {
-      console.log("Search:", query);
-    },
-    updateSchedule(newSchedule) {
-      this.schedule = newSchedule;
-    },
-  },
+    handleScheduleCreated(scheduleData) {
+      console.log('Schedule created:', scheduleData);
+    }
+  }
 };
 </script>
 
@@ -52,7 +36,7 @@ export default {
 }
 
 .map-container {
-  padding : 20px;
+  padding: 20px;
   width: 100%;
 }
 </style>

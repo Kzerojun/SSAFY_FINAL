@@ -56,6 +56,11 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
+    public String getScheduleName(int scheduleId) throws SQLException {
+        return this.scheduleMapper.getScheduleName(scheduleId);
+    }
+
+    @Override
     public void updateAttractionOrder(int scheduleId, List<AttractionOrderDto> attractions) throws SQLException {
 
         for(AttractionOrderDto attractionOrderDto : attractions) {

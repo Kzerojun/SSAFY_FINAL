@@ -13,7 +13,6 @@
           @finish="handleSlotFinish"
         />
       </div>
-      <!-- 레버 컨테이너 -->
       <div class="lever-container">
         <div 
           class="lever"
@@ -25,6 +24,46 @@
           <div class="lever-handle"></div>
           <div class="lever-stem"></div>
           <div class="lever-base"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 모달 컴포넌트 -->
+    <div v-if="showModal" class="modal-overlay" @click="closeModal">
+      <div class="modal-content" @click.stop>
+        <button class="close-button" @click="closeModal">&times;</button>
+        
+        <div class="attraction-info">
+          <h2>{{ attractionData.title }}</h2>
+          
+          <img 
+            v-if="attractionData.firstImage1" 
+            :src="attractionData.firstImage1" 
+            :alt="attractionData.title"
+            class="attraction-image"
+          >
+          
+          <div class="info-grid">
+            <div class="info-row">
+              <strong>주소:</strong>
+              <span>{{ attractionData.addr1 }} {{ attractionData.addr2 }}</span>
+            </div>
+            <div v-if="attractionData.tel" class="info-row">
+              <strong>전화번호:</strong>
+              <span>{{ attractionData.tel }}</span>
+            </div>
+            <div v-if="attractionData.homepage" class="info-row">
+              <strong>홈페이지:</strong>
+              <a :href="attractionData.homepage" target="_blank">바로가기</a>
+            </div>
+          </div>
+
+          <div v-if="attractionData.overview" class="overview">
+            <h3>개요</h3>
+            <p>{{ attractionData.overview }}</p>
+          </div>
+
+          <button class="add-button" @click="addToSchedule">내 일정에 추가</button>
         </div>
       </div>
     </div>
@@ -54,12 +93,13 @@ export default {
       currentSlotIndex: 0,
       isStarting: false,
       slotRefs: [],
-      // 레버 관련 상태 추가
       isLeverPulled: false,
       isDragging: false,
       startY: 0,
       currentY: 0,
       leverPosition: 0,
+      showModal: false,
+      attractionData: null,
     };
   },
 
@@ -88,10 +128,8 @@ export default {
       if (!this.isDragging) return;
 
       const deltaY = event.clientY - this.startY;
-      // 레버 이동 범위 제한 (0px ~ 100px)
       this.leverPosition = Math.min(Math.max(this.currentY + deltaY, 0), 100);
 
-      // 레버가 충분히 내려갔을 때 (80% 이상)
       if (this.leverPosition >= 80 && !this.isLeverPulled) {
         this.isLeverPulled = true;
         this.start();
@@ -103,14 +141,12 @@ export default {
       document.removeEventListener('mousemove', this.handleDrag);
       document.removeEventListener('mouseup', this.endDrag);
 
-      // 레버 원위치
       setTimeout(() => {
         this.leverPosition = 0;
         this.isLeverPulled = false;
       }, 500);
     },
 
-    // 기존 start 메소드
     async start() {
       if (this.isStarting) return;
 
@@ -128,115 +164,90 @@ export default {
     },
 
     startSlot(index) {
-        console.log('Starting slot:', index); // 디버깅용
-        if (index >= this.slots.length) return;
-        const slotComponent = this.slotRefs[index];
-        if (slotComponent) {
-          slotComponent.start();
-        } else {
-          console.error('Slot component not found:', index); // 디버깅용
-        }
-      },
-  
-      async handleSlotFinish(event) {
-        console.log('Slot finish event:', event); // 디버깅용
-        if (!event || !event.selectedValue) {
-          console.error("Invalid event data", event);
-          return;
-        }
-  
-        const { index, selectedValue } = event;
-        this.slots[index].selectedValue = selectedValue;
-  
-        if (index === 0) {
-          // 구군 데이터 설정
-          const gugunList = this.regionStore.getGugunsBySido(selectedValue.id);
-          console.log('Gugun list:', gugunList); // 디버깅용
-          this.slots[1].items = gugunList;
-        } else if (index === 1) {
-          // 관광 유형 데이터 설정 (직접 데이터 할당)
-          this.slots[2].items = [
-            { id: 12, name: "관광지" },
-            { id: 14, name: "문화시설" },
-            { id: 15, name: "축제공연행사" },
-            { id: 25, name: "여행코스" },
-            { id: 28, name: "레포츠" },
-            { id: 32, name: "숙박" },
-            { id: 38, name: "쇼핑" },
-            { id: 39, name: "음식점" },
-          ];
-          console.log('Content types set:', this.slots[2].items); // 디버깅용
-        } else if (index === 2) {
-          await this.sendResult();
-        }
-  
-        if (index < this.slots.length - 1) {
-          this.currentSlotIndex++;
-          console.log('Moving to next slot:', this.currentSlotIndex); // 디버깅용
-          this.$nextTick(() => {
-            this.startSlot(this.currentSlotIndex);
-          });
-        } else {
-          this.isStarting = false;
-        }
-      },
-  
-      async sendResult() {
-        const sido = this.slots[0].selectedValue.id;
-        const gugun = this.slots[1].selectedValue.id;
-        const content = this.slots[2].selectedValue.id;
-
-        try {
-          const response = await axios.post("http://localhost:80/enjoytrip/gatcha", {
-            sido,
-            gugun,
-            content,
-          }, {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-          });
-          
-          // 전체 응답 데이터 구조 확인
-          console.log("전체 응답:", response.data);
-          
-          // 응답 데이터의 세부 내용 확인
-          console.log("상태 코드:", response.data.code);
-          console.log("메시지:", response.data.message);
-          
-          // 관광지 정보 (attraction) 상세 로깅
-          const attraction = response.data.attraction;
-          console.log("관광지 정보:", {
-              contentId: attraction.contentId,
-              contentTypeId: attraction.contentTypeId,
-              title: attraction.title,
-              addr1: attraction.addr1,
-              addr2: attraction.addr2,
-              areaCode: attraction.areaCode,
-              siGunGuCode: attraction.siGunGuCode,
-              latitude: attraction.latitude,
-              longitude: attraction.longitude,
-          });
-
-          alert(`추천 여행지: ${attraction.title}`);
-        } catch (error) {
-          console.error("서버 요청 실패:", error);
-          if (error.response) {
-            // 서버 응답이 있는 경우
-            console.error("서버 응답 데이터:", error.response.data);
-            console.error("서버 응답 상태:", error.response.status);
-          }
-        }
-      },
+      if (index >= this.slots.length) return;
+      const slotComponent = this.slotRefs[index];
+      if (slotComponent) {
+        slotComponent.start();
+      }
     },
-  
-    created() {
-      this.slotRefs = new Array(this.slots.length).fill(null);
+
+    async handleSlotFinish(event) {
+      if (!event || !event.selectedValue) {
+        console.error("Invalid event data", event);
+        return;
+      }
+
+      const { index, selectedValue } = event;
+      this.slots[index].selectedValue = selectedValue;
+
+      if (index === 0) {
+        const gugunList = this.regionStore.getGugunsBySido(selectedValue.id);
+        this.slots[1].items = gugunList;
+      } else if (index === 1) {
+        this.slots[2].items = [
+          { id: 12, name: "관광지" },
+          { id: 14, name: "문화시설" },
+          { id: 15, name: "축제공연행사" },
+          { id: 25, name: "여행코스" },
+          { id: 28, name: "레포츠" },
+          { id: 32, name: "숙박" },
+          { id: 38, name: "쇼핑" },
+          { id: 39, name: "음식점" },
+        ];
+      } else if (index === 2) {
+        await this.sendResult();
+      }
+
+      if (index < this.slots.length - 1) {
+        this.currentSlotIndex++;
+        this.$nextTick(() => {
+          this.startSlot(this.currentSlotIndex);
+        });
+      } else {
+        this.isStarting = false;
+      }
     },
-  
+
+    async sendResult() {
+      try {
+        const response = await axios.post("http://localhost:80/enjoytrip/gatcha", {
+          sido: this.slots[0].selectedValue.id,
+          gugun: this.slots[1].selectedValue.id,
+          content: this.slots[2].selectedValue.id,
+        });
+        
+        this.attractionData = response.data.attraction;
+        this.showModal = true;
+      } catch (error) {
+        console.error("서버 요청 실패:", error);
+      }
+    },
+
+    closeModal() {
+      this.showModal = false;
+      this.attractionData = null;
+    },
+
+    async addToSchedule() {
+      try {
+        await axios.post("http://localhost:80/enjoytrip/schedule/attraction", {
+          contentId: this.attractionData.contentId,
+          scheduleId: 1 // TODO: 실제 일정 ID로 교체 필요
+        });
+        alert("일정에 추가되었습니다!");
+        this.closeModal();
+      } catch (error) {
+        console.error("일정 추가 실패:", error);
+        alert("일정 추가에 실패했습니다.");
+      }
+    }
+  },
+
+  created() {
+    this.slotRefs = new Array(this.slots.length).fill(null);
+  },
 
   beforeUnmount() {
-    // 이벤트 리스너 정리
     document.removeEventListener('mousemove', this.handleDrag);
     document.removeEventListener('mouseup', this.endDrag);
   }
@@ -248,6 +259,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-top: 40px;
 }
 
 .frame {
@@ -312,13 +324,85 @@ export default {
   background: linear-gradient(145deg, #cc0000, #990000);
 }
 
-/* 레버 호버 효과 */
 .lever:hover .lever-handle {
   transform: scale(1.05);
 }
 
-/* 레버 드래그 중 효과 */
 .lever:active .lever-handle {
   transform: scale(0.95);
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.close-button {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  font-size: 1.5rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.attraction-image {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin: 1rem 0;
+}
+
+.info-grid {
+  display: grid;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.info-row {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 1rem;
+}
+
+.overview {
+  margin: 1rem 0;
+}
+
+.add-button {
+  width: 100%;
+  padding: 1rem;
+  background: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-top: 1rem;
+}
+
+.add-button:hover {
+  background: #45a049;
 }
 </style>
