@@ -23,42 +23,21 @@
 		<result column="overview" property="overview"/>		
 	</resultMap>
 	
-	<select id="searchAttractionBySigungu" parameterType="String" resultMap="attraction">
-		SELECT *
-		FROM attractions
-		WHERE (area_code, si_gun_gu_code)
-		IN (SELECT s.sido_code, g.gugun_code
-			FROM sidos s, guguns g
-			WHERE s.sido_code = g.sido_code
-			AND s.sido_name = #{sidoName}
-			AND g.gugun_name = #{gugunName})
-	</select>
-	
-	<select id="searchAttractionBySigunguContentTypeName" parameterType="AttractionDto" resultMap="attraction">
-		SELECT *
-		FROM attractions
-		WHERE (area_code, si_gun_gu_code)
-		IN (SELECT s.sido_code, g.gugun_code
-			FROM sidos s, guguns g
-			WHERE s.sido_code = g.sido_code
-			AND s.sido_name = #{sidoName}
-			AND g.gugun_name = #{gugunName})
-		AND a.content_type_id = #{contentType}	
-	</select>
+
 	
 	<select id="searchAttraction" parameterType="AttractionDto" resultMap="attraction">
-	    SELECT *
-	    FROM attractions
-	    WHERE (area_code, si_gun_gu_code) IN (
-	        SELECT s.sido_code, g.gugun_code
-	        FROM sidos s, guguns g
-	        WHERE s.sido_code = g.sido_code
-	        AND s.sido_code = #{areaCode}
-	        AND g.gugun_code = #{siGunGuCode}
-	    )
-	    <if test="contentTypeId != 0">
-	        AND content_type_id = #{contentTypeId}
-	    </if>
+		SELECT *
+		FROM attractions
+		WHERE (area_code, si_gun_gu_code) IN (
+		SELECT s.sido_code, g.gugun_code
+		FROM sidos s, guguns g
+		WHERE s.sido_code = g.sido_code
+		AND s.sido_code = #{areaCode}
+		AND g.gugun_code = #{siGunGuCode}
+		)
+		<if test="contentTypeId != 0">
+			AND content_type_id = #{contentTypeId}
+		</if>
 	</select>
 	
 </mapper>

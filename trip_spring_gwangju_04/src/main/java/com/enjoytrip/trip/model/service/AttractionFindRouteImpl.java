@@ -3,7 +3,7 @@ package com.enjoytrip.trip.model.service;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import com.enjoytrip.trip.model.AttractionDto;
+import com.enjoytrip.trip.model.dto.AttractionDto;
 
 public class AttractionFindRouteImpl implements AttractionFindRoute{
 	private static final double R = 6371.0;  // 지구의 반지름 (단위: km)

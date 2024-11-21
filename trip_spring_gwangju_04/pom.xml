@@ -103,6 +103,7 @@
 			<artifactId>spring-boot-configuration-processor</artifactId>
 			<optional>true</optional>
 		</dependency>
+<<<<<<< HEAD
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -121,6 +122,13 @@
 
 
 	</dependencies>
+=======
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+    </dependencies>
+>>>>>>> 56dfdefd61afc84cd2c57bd20a1fa5743c747751
 
 	<build>
 		<plugins>

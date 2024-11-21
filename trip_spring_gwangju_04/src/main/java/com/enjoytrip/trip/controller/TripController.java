@@ -33,12 +33,12 @@ public class TripController {
 			@RequestParam int gugun, 
 			@RequestParam(defaultValue = "0") int content) throws SQLException{
 		
-		AttractionDto attraction = new AttractionDto();
-		attraction.setAreaCode(sido);
-		attraction.setSiGunGuCode(gugun);
-		attraction.setContentTypeId(content);
+		AttractionDto attractionDto = new AttractionDto();
+		attractionDto.setAreaCode(sido);
+		attractionDto.setSiGunGuCode(gugun);
+		attractionDto.setContentTypeId(content);
 		
-		List<AttractionDto> attractions = this.attractionService.searchAttraction(attraction);
+		List<AttractionDto> attractions = this.attractionService.searchAttraction(attractionDto);
 		
 		SearchAttractionResponseDto searchAttractionDto = new SearchAttractionResponseDto(
 				Code.SUCCESS,

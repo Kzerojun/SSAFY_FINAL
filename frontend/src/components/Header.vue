@@ -37,8 +37,8 @@
     <!-- 우측 메뉴 -->
     <div class="right-section">
       <nav class="menu">
-        <span @click = "gatch">여행 뽑기</span>
-        <span>일정 확인</span>
+        <span @click = "gatcha">여행 뽑기</span>
+        <span @click = "schedule">일정 확인</span>
         <UserOutlined class="icon" @click = "login"/>
         <ClockCircleOutlined class="icon" />
       </nav>
@@ -64,8 +64,12 @@ const main = () =>{
   router.push({ name: 'home' });
 }
 
-const gatch = () => {
+const gatcha = () => {
   router.push({ name: 'gatcha' })
+}
+
+const schedule = () => {
+  router.push({ name : 'schedule' })
 }
 
 </script>
