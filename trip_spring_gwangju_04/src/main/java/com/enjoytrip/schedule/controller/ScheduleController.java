@@ -3,6 +3,8 @@ package com.enjoytrip.schedule.controller;
 import com.enjoytrip.global.Code;
 import com.enjoytrip.global.Message;
 import com.enjoytrip.global.ResponseDto;
+import com.enjoytrip.jwt.service.JwtTokenExtractor;
+import com.enjoytrip.jwt.service.JwtTokenFactory;
 import com.enjoytrip.schedule.model.dto.*;
 import com.enjoytrip.schedule.model.service.ScheduleService;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,7 @@ import java.util.List;
 public class ScheduleController {
 
     private final ScheduleService scheduleService;
+    //private final JwtTokenFactory jwtTokenFactory;
 
     @PostMapping()
     public ResponseEntity<ResponseDto> createSchedule(@RequestBody ScheduleDto scheduleDto)
@@ -36,6 +39,7 @@ public class ScheduleController {
         return ResponseEntity.ok(responseDto);
     }
 
+    // TODO : 일단은 userEmail로 test하고, 이후 Token으로 request 수정
     @GetMapping()
     public ResponseEntity<ListScheduleResponseDto> listSchedule(@RequestParam String userEmail)
         throws SQLException {
