@@ -39,10 +39,13 @@
       <nav class="menu">
         <span @click = "gatcha">여행 뽑기</span>
         <span @click = "schedule">일정 확인</span>
-        <UserOutlined class="icon" @click = "login"/>
+        <UserMenu />
+        <UserOutlined class="icon" v-if="!isLoggedIn"  @click = "login"/>
         <ClockCircleOutlined class="icon" />
       </nav>
     </div>
+
+
   </a-layout-header>
 </template>
 
@@ -50,6 +53,9 @@
 import { Layout } from 'ant-design-vue';
 import { UserOutlined, ClockCircleOutlined } from '@ant-design/icons-vue';
 import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/stores/auth'; // Pinia Auth Store import
+import UserMenu from "@/components/UserMenu.vue";
+import {computed} from "vue";
 
 // Ant Design 컴포넌트 명시적 등록
 const ALayoutHeader = Layout.Header;
@@ -71,6 +77,12 @@ const gatcha = () => {
 const schedule = () => {
   router.push({ name : 'schedule' })
 }
+
+// Pinia Auth Store 사용
+const authStore = useAuthStore();
+
+// 로그인 상태 확인 (accessToken 존재 여부)
+const isLoggedIn = computed(() => authStore.accessToken !== null);
 
 </script>
 

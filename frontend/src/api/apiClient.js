@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useAuthStore } from '@/stores/auth';
 
 const apiClient = axios.create({
-  baseURL: 'http://localhost:80/enjoytrip', // 기본 API URL
+  baseURL: 'http://localhost:80/enjoytrip/', // 기본 API URL
 });
 
 // 요청 인터셉터 추가
