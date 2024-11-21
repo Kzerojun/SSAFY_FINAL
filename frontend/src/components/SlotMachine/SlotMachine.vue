@@ -259,6 +259,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-top: 40px;
 }
 
 .frame {

@@ -81,6 +81,41 @@
             드래그하여 장소를 추가하세요
           </div>
         </div>
+
+        <div class="bottom-controls">
+          <button 
+            class="create-schedule-btn" 
+            @click="showCreateScheduleModal"
+            :disabled="selectedPlaces.length === 0"
+          >
+            일정 생성
+          </button>
+        </div>
+      </div>
+
+      <!-- 일정 생성 모달 -->
+    <div v-if="showModal" class="modal-overlay" @click="closeModal">
+        <div class="modal-content" @click.stop>
+          <h2>새 일정 만들기</h2>
+          <form @submit.prevent="createSchedule">
+            <div class="form-group">
+              <label>일정 이름</label>
+              <input v-model="scheduleForm.scheduleName" type="text" required>
+            </div>
+            <div class="form-group">
+              <label>시작 날짜</label>
+              <input v-model="scheduleForm.startDate" type="date" required>
+            </div>
+            <div class="form-group">
+              <label>종료 날짜</label>
+              <input v-model="scheduleForm.endDate" type="date" required>
+            </div>
+            <div class="modal-buttons">
+              <button type="button" @click="closeModal">취소</button>
+              <button type="submit">완료</button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   </template>
@@ -92,41 +127,25 @@
 
   export default {
     name: "DragDropSchedule",
-    data() {
-      return {
-        scheduleData: [], // 데이터를 저장할 배열
-      };
-    },
-    methods: {
-      fetchScheduleData() {
-        const url = "http://localhost:80/enjoytrip/trip/schedule"; // 백엔드 API 엔드포인트
-        fetch(url)
-            .then((response) => response.json())
-            .then((data) => {
-              this.scheduleData = data; // API 데이터 저장
-              this.$emit("update-schedule", this.scheduleData); // 부모로 데이터 전달
-            })
-            .catch((error) => {
-              console.error("데이터 가져오기 실패:", error);
-            });
-      },
-    },
-    mounted() {
-      this.fetchScheduleData(); // 컴포넌트 로드 시 API 호출
-    },
     setup() {
-      const sidos = reactive([]);
-      const guguns = reactive([]);
-      const selectedSido = ref(""); // ref로 변경
-      const selectedGugun = ref("");
-      const selectedContentType = ref("0");
-      const places = reactive([]);
-      const searchResults = reactive([]);
-      const selectedPlaces = reactive([]);
+    const sidos = reactive([]);
+    const guguns = reactive([]);
+    const selectedSido = ref("");
+    const selectedGugun = ref("");
+    const selectedContentType = ref("0");
+    const places = reactive([]);
+    const searchResults = reactive([]);
+    const selectedPlaces = reactive([]);
+    const showModal = ref(false);
+    const scheduleForm = reactive({
+      scheduleName: '',
+      startDate: '',
+      endDate: ''
+    });
 
-      const isSearchEnabled = computed(() => selectedSido.value && selectedGugun.value);
+    const isSearchEnabled = computed(() => selectedSido.value && selectedGugun.value);
 
-      const fetchSidoOptions = () => {
+    const fetchSidoOptions = () => {
         const url = "https://apis.data.go.kr/B551011/KorService1/areaCode1";
         const params = {
           serviceKey: "Mub0bm4epPcrhuQFwy%2F1s31j04EOcTy1JGaOAQM1hmRrFOpjrjsm4vdNu5wCojATTsagW%2FlLpZsE3zxyu9YJ4Q%3D%3D",
@@ -221,7 +240,44 @@
             });
       };
 
+      const showCreateScheduleModal = () => {
+        showModal.value = true;
+      };
 
+      const closeModal = () => {
+        showModal.value = false;
+        Object.assign(scheduleForm, {
+          scheduleName: '',
+          startDate: '',
+          endDate: ''
+        });
+      };
+
+      const createSchedule = async () => {
+        try {
+          const response = await axios.post('http://localhost:80/enjoytrip/schedule', {
+            userEmail: 'user@email.com', // TODO: 실제 사용자 이메일로 교체
+            scheduleName: scheduleForm.scheduleName,
+            startDate: scheduleForm.startDate,
+            endDate: scheduleForm.endDate
+          });
+
+          const scheduleId = response.data.scheduleId;
+
+          for (let i = 0; i < selectedPlaces.length; i++) {
+            await axios.post(`http://localhost:80/enjoytrip/schedule/${scheduleId}/attractions`, {
+              contentId: selectedPlaces[i].contentId
+            });
+          }
+
+          message.success('일정이 생성되었습니다!');
+          selectedPlaces.splice(0, selectedPlaces.length);
+          closeModal();
+        } catch (error) {
+          console.error('일정 생성 실패:', error);
+          message.error('일정 생성에 실패했습니다.');
+        }
+      };
 
       const onDragStart = (place, event) => {
         event.dataTransfer.setData("place", JSON.stringify(place));
@@ -238,7 +294,6 @@
 
       const combinedPlaces = computed(() => [...places, ...searchResults]);
 
-      // Watch to automatically fetch Gugun data when Sido changes
       watch(selectedSido, (newValue) => {
         console.log("selectedSido 변경:", newValue);
         fetchGugunOptions();
@@ -256,12 +311,17 @@
         selectedSido,
         selectedGugun,
         isSearchEnabled,
+        showModal,
+        scheduleForm,
         fetchSidoOptions,
         fetchGugunOptions,
         searchAttractions,
         onDragStart,
         onDrop,
         removePlace,
+        showCreateScheduleModal,
+        closeModal,
+        createSchedule,
         contentTypes: [
           { id: 12, name: "관광지" },
           { id: 14, name: "문화시설" },
@@ -271,8 +331,7 @@
           { id: 38, name: "쇼핑" },
           { id: 39, name: "음식점" },
         ],
-        selectedContentType : "0",
-
+        selectedContentType: "0",
       };
     },
   };
@@ -386,4 +445,84 @@
   .delete-button:hover {
     background-color: #ff7875;
   }
-  </style>
+
+  .bottom-controls {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .create-schedule-btn {
+    padding: 10px 20px;
+    background-color: #1890ff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .create-schedule-btn:disabled {
+    background-color: #d9d9d9;
+    cursor: not-allowed;
+  }
+
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    min-width: 300px;
+  }
+
+  .form-group {
+    margin-bottom: 15px;
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  .form-group input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+  }
+
+  .modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .modal-buttons button {
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .modal-buttons button[type="submit"] {
+    background-color: #1890ff;
+    color: white;
+    border: none;
+  }
+
+  .modal-buttons button[type="button"] {
+    background-color: white;
+    border: 1px solid #d9d9d9;
+  }
+</style>
