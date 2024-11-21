@@ -9,8 +9,8 @@
         v-for="schedule in schedules"
         :key="schedule.scheduleId"
         class="schedule-card"
-      >
-        <h2 class="schedule-title">{{ schedule.scheduleName }}</h2>
+        @click="goToScheduleAttractions(schedule.scheduleId)">
+        <h2 class="schedule-title"> {{ schedule.scheduleName }} </h2>
         <p class="schedule-date">
           일정: {{ formatDate(schedule.startDate) }} ~ {{ formatDate(schedule.endDate) }}
         </p>
@@ -25,9 +25,13 @@
 <script lang="ts" setup>
   import { ref, onMounted } from 'vue';
   import axios from 'axios';
+  import { useRouter } from 'vue-router';
 
   // 여행 일정 상태
   const schedules = ref<any[]>([]);
+
+  // 라우터 인스턴스
+  const router = useRouter();
 
   // 서버로부터 일정 데이터를 불러오는 함수
   const fetchSchedules = async () => {
@@ -50,6 +54,11 @@
   const formatDate = (date: string) => {
     const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'short', day: 'numeric' };
     return new Date(date).toLocaleDateString('ko-KR', options);
+  };
+
+  // 일정 상세 페이지로 이동
+  const goToScheduleAttractions = (scheduleId: number) => {
+    router.push({ name: 'schedule-attractions', params: { scheduleId } });
   };
 
   // 컴포넌트가 마운트될 때 일정 데이터를 불러옴
@@ -76,6 +85,7 @@
   background-color: #f9f9f9;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: pointer; /* 클릭 가능한 카드 */
 }
 
 .schedule-date,
