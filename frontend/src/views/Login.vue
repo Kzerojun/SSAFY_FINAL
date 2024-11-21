@@ -75,6 +75,7 @@ import { Typography } from 'ant-design-vue';
 import { message } from 'ant-design-vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
+import {useAuthStore} from "@/stores/auth.js";
 
 const { Title: ATypographyTitle } = Typography;
 
@@ -109,17 +110,18 @@ export default defineComponent({
       ]
     };
 
+
+    const authStore = useAuthStore();
     const onFinish = async (values) => {
       loading.value = true;
       try {
         const response = await axios.post('http://localhost:80/enjoytrip/auth/login', {
-          userEmail: values.email,
-          userPwd: values.password,
+          accessToken : values.accessToken
         });
 
         if (response.status === 200) {
-          const { userName } = response.data;
-          message.success(`안녕하세요, ${userName}님!`);
+          message.success(`강원랜트에 오신거 환영합니다.`);
+          authStore.setAccessToken(response.data.accessToken);
 
           // 로그인 성공 후 메인 페이지로 리다이렉트
           setTimeout(() => {
