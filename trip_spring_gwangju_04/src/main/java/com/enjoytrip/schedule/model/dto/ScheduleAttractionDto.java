@@ -9,6 +9,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ScheduleAttractionDto {
 
+    private int scheduleAttractionId;
     private String title;
     private double latitude;
     private double longitude;
