@@ -32,7 +32,7 @@ public class JwtTokenFactory {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + ACCESS_TOKEN_VALIDITY_SECONDS);
 
-        return JwtConstants.BEARER_TYPE.getValue() + JWT.create()
+        return  JWT.create()
                 .withSubject(username)
                 .withClaim(JwtConstants.ROLE.getValue(), roles)
                 .withIssuedAt(now)

@@ -33,6 +33,7 @@ const routes = [
   { path: '/signup', name: 'signup', component: Signup },
   { path: '/gatcha', name: 'gatcha', component: Gatcha},
   { path: '/schedule', name: 'schedule', component: Schedule},
+
   { path : '/search',name :'search',component: MainSearch},
   { path: '/schedule/:scheduleId/attractions', 
     name: 'schedule-attractions',

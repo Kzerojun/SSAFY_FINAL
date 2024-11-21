@@ -14,7 +14,7 @@
           :rules="rules"
       >
         <AFormItem
-            name="email"
+            name="userEmail"
             label="이메일"
             has-feedback
         >
@@ -25,7 +25,7 @@
         </AFormItem>
 
         <AFormItem
-            name="password"
+            name="userPwd"
             label="비밀번호"
             has-feedback
         >
@@ -112,11 +112,12 @@ export default defineComponent({
 
 
     const authStore = useAuthStore();
-    const onFinish = async (values) => {
+    const onFinish = async () => {
       loading.value = true;
       try {
         const response = await axios.post('http://localhost:80/enjoytrip/auth/login', {
-          accessToken : values.accessToken
+          userEmail: formState.email, // 이메일 전송
+          userPwd: formState.password, // 비밀번호 전송
         });
 
         if (response.status === 200) {
@@ -280,7 +281,7 @@ export default defineComponent({
   background-color: #fee500;
 }
 
-:deep(.ant-form-item-label > label) {
+:deep(.ant-form-item-label label) {
   font-family: Arial, sans-serif;
   font-weight: 500;
 }

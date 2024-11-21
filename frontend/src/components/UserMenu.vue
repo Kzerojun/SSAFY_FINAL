@@ -5,7 +5,7 @@
       <a-avatar></a-avatar>
       <div class="user-profile">
         <div class="user-details">
-          <p class="username">{{authStore.user}}</p>
+          <p class="username">{{ authStore.email}}</p>
         </div>
       </div>
     </a-card>
@@ -15,7 +15,7 @@
       <div v-if="isMenuVisible" class="dropdown-menu">
         <ul class="menu-list">
           <li v-for="(item, index) in menuItems" :key="index" class="menu-item" @click="handleMenuClick(item)">
-            <component v-if="item.icon" :is="item.icon" class="menu-icon" />
+            <component v-if="item" :is="item" class="menu-icon" />
             <span class="menu-label">{{ item.label }}</span>
           </li>
         </ul>
@@ -103,11 +103,6 @@ const handleMenuClick = (item) => {
   margin: 0;
 }
 
-.user-id {
-  font-size: 14px;
-  color: #999;
-  margin: 0;
-}
 
 /* 드롭다운 메뉴 */
 .dropdown-menu {
