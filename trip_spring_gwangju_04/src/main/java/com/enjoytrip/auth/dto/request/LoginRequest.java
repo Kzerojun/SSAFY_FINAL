@@ -12,9 +12,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 public class LoginRequest {
 
     private String userEmail;
-    private String password;
+    private String userPwd;
 
     public UsernamePasswordAuthenticationToken toAuthentication() {
-        return new UsernamePasswordAuthenticationToken(userEmail, password);
+        return new UsernamePasswordAuthenticationToken(userEmail, userPwd);
     }
 }

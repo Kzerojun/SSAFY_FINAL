@@ -124,7 +124,6 @@ export default defineComponent({
           const { userName } = response.data;
           message.success(`안녕하세요, ${userName}님!`);
 
-          // 로그인 성공 후 메인 페이지로 리다이렉트
           setTimeout(() => {
             router.push('/');
           }, 1500);

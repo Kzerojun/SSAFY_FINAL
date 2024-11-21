@@ -20,20 +20,24 @@
 
     <!-- 로그인 -->
     <select id="loginUser" parameterType="com.enjoytrip.auth.dto.request.LoginRequest" resultType="com.enjoytrip.user.model.dto.UserDto">
-        SELECT user_no AS userNo,
-               user_email AS email,
-               user_name AS name,
-               created_at AS createdAt
+        SELECT
+            user_no AS userNo,         -- UserDto의 userNo 필드에 매핑
+            user_email AS userEmail,   -- UserDto의 userEmail 필드에 매핑
+            user_pwd AS userPwd,       -- UserDto의 userPwd 필드에 매핑
+            user_name AS userName,     -- UserDto의 userName 필드에 매핑
+            created_at AS createdAt    -- UserDto의 createdAt 필드에 매핑
         FROM users
         WHERE user_email = #{email}
           AND user_pwd = #{password}
     </select>
 
     <select id="getUserByEmail" parameterType="string" resultType="com.enjoytrip.user.model.dto.UserDto">
-        SELECT user_no AS userNo,
-               user_email AS email,
-               user_name AS name,
-               created_at AS createdAt
+        SELECT
+            user_no AS userNo,         -- UserDto의 userNo 필드에 매핑
+            user_email AS userEmail,   -- UserDto의 userEmail 필드에 매핑
+            user_pwd AS userPwd,       -- UserDto의 userPwd 필드에 매핑
+            user_name AS userName,     -- UserDto의 userName 필드에 매핑
+            created_at AS createdAt    -- UserDto의 createdAt 필드에 매핑
         FROM users
         WHERE user_email = #{email}
     </select>

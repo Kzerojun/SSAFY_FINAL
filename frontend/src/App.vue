@@ -8,6 +8,7 @@
 
 <script lang="ts" setup>
 import Header from './components/Header.vue';
+import MainSearch from "@/views/Travel.vue";
 </script>
 
 <style>

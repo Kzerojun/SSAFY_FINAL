@@ -25,8 +25,8 @@ public class AuthServiceImplement implements AuthService {
     public LoginResponse login(LoginRequest request) {
 
         //TODO : Spring Security 오류
-//        Authentication authentication = authenticationProcessor.authenticate(request);
-        String token = jwtTokenFactory.generateToken(request.toAuthentication());
+        Authentication authentication = authenticationProcessor.authenticate(request);
+        String token = jwtTokenFactory.generateToken(authentication);
         return LoginResponse.success(token);
     }
 

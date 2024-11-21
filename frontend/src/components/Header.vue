@@ -39,6 +39,7 @@
       <nav class="menu">
         <span @click = "gatcha">여행 뽑기</span>
         <span @click = "schedule">일정 확인</span>
+        <span @click = "search">여행 일정 만들기</span>
         <UserOutlined class="icon" @click = "login"/>
         <ClockCircleOutlined class="icon" />
       </nav>
@@ -71,6 +72,13 @@ const gatcha = () => {
 const schedule = () => {
   router.push({ name : 'schedule' })
 }
+
+
+const search = () => {
+  router.push({ name : 'search' })
+}
+
+
 
 </script>
 
