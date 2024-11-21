@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.enjoytrip.auth.model.mapper.AuthMapper">
+
+    <!-- 회원가입 -->
+    <insert id="signUp" parameterType="com.enjoytrip.auth.dto.request.SignUpRequest">
+        INSERT INTO users (user_email, user_pwd, user_name)
+        VALUES (#{email}, #{password}, #{name})
+    </insert>
+
+    <!-- 사용자 비활성화 -->
+    <update id="deactivateUser" parameterType="com.enjoytrip.auth.dto.request.DeactivateRequest">
+        UPDATE users
+        SET user_pwd = NULL
+        WHERE user_email = #{email}
+    </update>
+
+    <!-- 로그인 -->
+    <select id="loginUser" parameterType="com.enjoytrip.auth.dto.request.LoginRequest" resultType="com.enjoytrip.user.model.dto.UserDto">
+        SELECT user_no AS userNo,
+               user_email AS email,
+               user_name AS name,
+               created_at AS createdAt
+        FROM users
+        WHERE user_email = #{email}
+          AND user_pwd = #{password}
+    </select>
+
+    <select id="getUserByEmail" parameterType="string" resultType="com.enjoytrip.user.model.dto.UserDto">
+        SELECT user_no AS userNo,
+               user_email AS email,
+               user_name AS name,
+               created_at AS createdAt
+        FROM users
+        WHERE user_email = #{email}
+    </select>
+
+</mapper>

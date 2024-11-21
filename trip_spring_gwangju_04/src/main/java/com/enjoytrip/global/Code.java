@@ -1,14 +1,23 @@
 package com.enjoytrip.global;
 
-import lombok.AllArgsConstructor;
+
 import lombok.Getter;
 
-@Getter
-@AllArgsConstructor
-public enum Code {
-	
-	SUCCESS("200");
-	
-	private final String code;
-}
+import com.fasterxml.jackson.annotation.JsonValue;
 
+@Getter
+public enum Code {
+
+	SUCCESS("SU");
+
+	private final String code;
+
+	Code(String code) {
+		this.code = code;
+	}
+
+	@JsonValue
+	public String getCode() {
+		return code;
+	}
+}

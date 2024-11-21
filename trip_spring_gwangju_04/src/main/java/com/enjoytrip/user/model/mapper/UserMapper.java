@@ -18,4 +18,7 @@ public interface UserMapper {
 	void deleteUser(UserDto userDto) throws SQLException;
 	
 	UserDto getUserProfile(int userNo) throws SQLException;
+
+	UserDto getUserByEmail(String email) throws SQLException;
+
 }

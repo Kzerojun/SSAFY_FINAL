@@ -1,94 +1,162 @@
 <template>
   <div class="login-container">
-    <!-- 배경 이미지 -->
     <div class="background-overlay"></div>
 
-    <!-- 카드 -->
-    <Card class="card">
-      <TypographyTitle level="2" class="title">강원랜트</TypographyTitle>
+    <ACard class="card">
+      <ATypographyTitle :level="2" class="title">강원랜트</ATypographyTitle>
       <p class="subtitle">당신만의 특별한 랜덤 여행을 시작하세요!</p>
-      <Form @submit.prevent="handleSubmit" layout="vertical" class="login-form">
-        <FormItem
-            label="이메일"
+
+      <AForm
+          :model="formState"
+          @finish="onFinish"
+          layout="vertical"
+          class="login-form"
+          :rules="rules"
+      >
+        <AFormItem
             name="email"
-            :rules="[ { required: true, message: '이메일을 입력하세요!' }, { type: 'email', message: '올바른 이메일 형식이 아닙니다!' } ]"
+            label="이메일"
+            has-feedback
         >
-          <Input v-model="email" type="email" placeholder="이메일을 입력하세요" />
-        </FormItem>
-        <FormItem
-            label="비밀번호"
+          <AInput
+              v-model:value="formState.email"
+              placeholder="이메일을 입력하세요"
+          />
+        </AFormItem>
+
+        <AFormItem
             name="password"
-            :rules="[{ required: true, message: '비밀번호를 입력하세요!' }]"
+            label="비밀번호"
+            has-feedback
         >
-          <InputPassword v-model="password" placeholder="비밀번호를 입력하세요" />
-        </FormItem>
-        <FormItem>
-          <Button type="primary" html-type="submit" block class="submit-button">
+          <AInputPassword
+              v-model:value="formState.password"
+              placeholder="비밀번호를 입력하세요"
+          />
+        </AFormItem>
+
+        <AFormItem>
+          <AButton
+              type="primary"
+              html-type="submit"
+              :loading="loading"
+              block
+              class="submit-button"
+          >
             로그인
-          </Button>
-        </FormItem>
+          </AButton>
+        </AFormItem>
+
         <div class="footer">
-          <router-link to="/signup">회원가입</router-link> | <router-link to="/forgot-password">비밀번호 찾기</router-link>
+          <RouterLink to="/signup">회원가입</RouterLink> |
+          <RouterLink to="/forgot-password">비밀번호 찾기</RouterLink>
         </div>
 
-        <!-- Oauth 로그인 버튼 -->
         <div class="oauth-buttons">
-          <button class="oauth-button naver">
+          <button class="oauth-button naver" @click="handleNaverLogin">
             <img src="@/assets/naver_circle.png" alt="네이버 로그인" />
           </button>
-          <button class="oauth-button kakao">
+          <button class="oauth-button kakao" @click="handleKakaoLogin">
             <img src="@/assets/kakaoTalk_logo.svg" alt="카카오 로그인" />
           </button>
         </div>
-      </Form>
-    </Card>
+      </AForm>
+    </ACard>
   </div>
 </template>
 
 <script>
-import { Card, Typography, Form, Input, Button } from "ant-design-vue";
-import axios from "axios";
+import { defineComponent, reactive, ref } from 'vue';
+import { Card as ACard } from 'ant-design-vue';
+import { Form as AForm, FormItem as AFormItem } from 'ant-design-vue';
+import { Input as AInput, InputPassword as AInputPassword } from 'ant-design-vue';
+import { Button as AButton } from 'ant-design-vue';
+import { Typography } from 'ant-design-vue';
+import { message } from 'ant-design-vue';
+import { useRouter } from 'vue-router';
+import axios from 'axios';
 
-export default {
-  name: "Login",
+const { Title: ATypographyTitle } = Typography;
+
+export default defineComponent({
+  name: 'Login',
   components: {
-    Card,
-    TypographyTitle: Typography.Title,
-    Form,
-    FormItem: Form.Item,
-    Input,
-    InputPassword: Input.Password,
-    Button,
+    ACard,
+    AForm,
+    AFormItem,
+    AInput,
+    AInputPassword,
+    AButton,
+    ATypographyTitle,
   },
-  data() {
-    return {
-      email: "",
-      password: "",
+  setup() {
+    const router = useRouter();
+    const loading = ref(false);
+
+    const formState = reactive({
+      email: '',
+      password: '',
+    });
+
+    const rules = {
+      email: [
+        { required: true, message: '이메일을 입력하세요!' },
+        { type: 'email', message: '올바른 이메일 형식이 아닙니다!' }
+      ],
+      password: [
+        { required: true, message: '비밀번호를 입력하세요!' },
+        { min: 6, message: '비밀번호는 최소 6자 이상이어야 합니다' }
+      ]
     };
-  },
-  methods: {
-    async handleSubmit() {
+
+    const onFinish = async (values) => {
+      loading.value = true;
       try {
-        const response = await axios.post("http://localhost:80/enjoytrip/user/login", {
-          userEmail: this.email,
-          userPwd: this.password,
+        const response = await axios.post('http://localhost:80/enjoytrip/auth/login', {
+          userEmail: values.email,
+          userPwd: values.password,
         });
 
         if (response.status === 200) {
-          const data = response.data;
-          alert(`안녕하세요, ${data.userName}님!`);
+          const { userName } = response.data;
+          message.success(`안녕하세요, ${userName}님!`);
+
+          // 로그인 성공 후 메인 페이지로 리다이렉트
+          setTimeout(() => {
+            router.push('/');
+          }, 1500);
         }
       } catch (error) {
-        console.error("로그인 실패:", error.response?.data || error.message);
-        alert("로그인 실패! 다시 시도해주세요.");
+        console.error('로그인 실패:', error.response?.data || error.message);
+        message.error('이메일 또는 비밀번호가 올바르지 않습니다.');
+      } finally {
+        loading.value = false;
       }
-    },
+    };
+
+    const handleNaverLogin = () => {
+      // 네이버 로그인 구현
+      console.log('네이버 로그인');
+    };
+
+    const handleKakaoLogin = () => {
+      // 카카오 로그인 구현
+      console.log('카카오 로그인');
+    };
+
+    return {
+      formState,
+      loading,
+      rules,
+      onFinish,
+      handleNaverLogin,
+      handleKakaoLogin,
+    };
   },
-};
+});
 </script>
 
 <style scoped>
-/* 로그인 전체 컨테이너 */
 .login-container {
   position: relative;
   display: flex;
@@ -99,7 +167,6 @@ export default {
   overflow: hidden;
 }
 
-/* 배경 이미지와 오버레이 */
 .background-overlay {
   position: absolute;
   top: 0;
@@ -113,7 +180,6 @@ export default {
   z-index: 1;
 }
 
-/* 카드 */
 .card {
   position: relative;
   z-index: 2;
@@ -123,13 +189,12 @@ export default {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   background-color: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(10px);
-  text-align: center;
 }
 
 .title {
-  text-align: center;
-  margin-bottom: 12px;
-  color: #ffcc00;
+  text-align: center !important;
+  margin-bottom: 12px !important;
+  color: #ffcc00 !important;
   font-family: Arial, sans-serif;
 }
 
@@ -137,31 +202,32 @@ export default {
   font-size: 14px;
   color: #666;
   margin-bottom: 20px;
+  text-align: center;
 }
 
-/* 로그인 폼 */
 .login-form {
   margin-top: 16px;
 }
 
-/* 로그인 버튼 */
 .submit-button {
   font-weight: bold;
-  background-color: #ffcc00; /* 노란색 버튼 */
-  border: none;
-  transition: background-color 0.3s ease;
+  height: 40px;
+  font-size: 16px;
+  background-color: #ffcc00;
+  border-color: #ffcc00;
 }
 
 .submit-button:hover {
-  background-color: #ffb700; /* 호버 시 조금 더 진한 노란색 */
+  background-color: #ffb700;
+  border-color: #ffb700;
   color: #333;
 }
 
-/* 링크 섹션 */
 .footer {
   margin-top: 16px;
   font-size: 12px;
   color: #555;
+  text-align: center;
 }
 
 .footer a {
@@ -173,7 +239,6 @@ export default {
   text-decoration: underline;
 }
 
-/* Oauth 버튼 스타일 */
 .oauth-buttons {
   display: flex;
   justify-content: center;
@@ -211,5 +276,14 @@ export default {
 
 .oauth-button.kakao {
   background-color: #fee500;
+}
+
+:deep(.ant-form-item-label > label) {
+  font-family: Arial, sans-serif;
+  font-weight: 500;
+}
+
+:deep(.ant-input) {
+  font-family: Arial, sans-serif;
 }
 </style>

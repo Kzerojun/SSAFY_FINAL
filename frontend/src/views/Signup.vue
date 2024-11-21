@@ -1,133 +1,205 @@
 <template>
   <div class="signup-container">
-    <!-- 배경 이미지 -->
     <div class="background-overlay"></div>
 
-    <!-- 회원가입 제목 -->
-    <TypographyTitle level="2" class="title">회원가입</TypographyTitle>
+    <ATypographyTitle :level="2" class="title">회원가입</ATypographyTitle>
     <p class="subtitle">당신만의 특별한 랜덤 여행을 시작하세요!</p>
 
-    <!-- 회원가입 폼 -->
-    <Form @submit.prevent="handleSignup" layout="vertical" class="signup-form">
-      <!-- 이메일 -->
-      <FormItem
+    <AForm
+        :model="formState"
+        @finish="onFinish"
+        @finishFailed="onFinishFailed"
+        :rules="rules"
+        layout="vertical"
+        class="signup-form"
+    >
+      <!-- 이메일 폼 아이템 -->
+      <AFormItem
+          name="email"
           label="이메일"
-          name="userEmail"
-          :rules="[
-          { required: true, message: '이메일을 입력하세요!' },
-          { type: 'email', message: '올바른 이메일 형식이 아닙니다!' }
-        ]"
+          has-feedback
       >
-        <Input v-model="userEmail" type="email" placeholder="이메일을 입력하세요" />
-      </FormItem>
+        <AInput
+            v-model:value="formState.email"
+            placeholder="이메일을 입력하세요"
+        />
+      </AFormItem>
 
-      <!-- 비밀번호 -->
-      <FormItem
+      <!-- 비밀번호 폼 아이템 -->
+      <AFormItem
+          name="password"
           label="비밀번호"
-          name="userPwd"
-          :rules="[ { required: true, message: '비밀번호를 입력하세요!' } ]"
+          has-feedback
       >
-        <InputPassword v-model="userPwd" placeholder="비밀번호를 입력하세요" />
-      </FormItem>
+        <AInputPassword
+            v-model:value="formState.password"
+            placeholder="비밀번호를 입력하세요"
+        />
+      </AFormItem>
 
-      <!-- 비밀번호 확인 -->
-      <FormItem
+      <!-- 비밀번호 확인 폼 아이템 -->
+      <AFormItem
+          name="confirmPassword"
           label="비밀번호 확인"
-          name="userPwdConfirm"
-          :rules="[
-          { required: true, message: '비밀번호를 다시 입력하세요!' },
-          { validator: validatePassword, trigger: 'blur' }
-        ]"
+          has-feedback
       >
-        <InputPassword v-model="userPwdConfirm" placeholder="비밀번호를 다시 입력하세요" />
-      </FormItem>
+        <AInputPassword
+            v-model:value="formState.confirmPassword"
+            placeholder="비밀번호를 다시 입력하세요"
+        />
+      </AFormItem>
 
-      <!-- 회원 성함 -->
-      <FormItem
+      <!-- 이름 폼 아이템 -->
+      <AFormItem
+          name="name"
           label="회원 성함"
-          name="userName"
-          :rules="[ { required: true, message: '이름을 입력하세요!' } ]"
+          has-feedback
       >
-        <Input v-model="userName" placeholder="이름을 입력하세요" />
-      </FormItem>
+        <AInput
+            v-model:value="formState.name"
+            placeholder="이름을 입력하세요"
+        />
+      </AFormItem>
 
-      <!-- 회원가입 버튼 -->
-      <FormItem>
-        <Button type="primary" html-type="submit" block class="submit-button">
+      <!-- 제출 버튼 -->
+      <AFormItem>
+        <AButton
+            type="primary"
+            html-type="submit"
+            :loading="loading"
+            block
+            class="submit-button"
+        >
           회원가입
-        </Button>
-      </FormItem>
-    </Form>
+        </AButton>
+      </AFormItem>
+    </AForm>
   </div>
 </template>
 
 <script>
-import { Typography, Form, Input, Button } from "ant-design-vue";
+import { defineComponent, reactive, ref } from 'vue';
+import { Form as AForm, FormItem as AFormItem } from 'ant-design-vue';
+import { Input as AInput, InputPassword as AInputPassword } from 'ant-design-vue';
+import { Button as AButton } from 'ant-design-vue';
+import { Typography } from 'ant-design-vue';
+import { message } from 'ant-design-vue';
+import axios from 'axios';
 
-export default {
-  name: "Signup",
+const { Title: ATypographyTitle } = Typography;
+
+export default defineComponent({
+  name: 'Signup',
   components: {
-    TypographyTitle: Typography.Title,
-    Form,
-    FormItem: Form.Item,
-    Input,
-    InputPassword: Input.Password,
-    Button,
+    AForm,
+    AFormItem,
+    AInput,
+    AInputPassword,
+    AButton,
+    ATypographyTitle,
   },
-  data() {
+  setup() {
+    const loading = ref(false);
+
+    // 폼 상태 관리
+    const formState = reactive({
+      email: '',
+      password: '',
+      confirmPassword: '',
+      name: '',
+    });
+
+    // 폼 검증 규칙
+    const rules = {
+      email: [
+        { required: true, message: '이메일을 입력해주세요' },
+        { type: 'email', message: '올바른 이메일 형식이 아닙니다' },
+      ],
+      password: [
+        { required: true, message: '비밀번호를 입력해주세요' },
+        { min: 6, message: '비밀번호는 최소 6자 이상이어야 합니다' },
+      ],
+      confirmPassword: [
+        { required: true, message: '비밀번호 확인을 입력해주세요' },
+        ({ getFieldValue }) => ({
+          validator(_, value) {
+            if (!value || getFieldValue('password') === value) {
+              return Promise.resolve();
+            }
+            return Promise.reject('비밀번호가 일치하지 않습니다');
+          },
+        }),
+      ],
+      name: [
+        { required: true, message: '이름을 입력해주세요' },
+        { min: 2, message: '이름은 최소 2자 이상이어야 합니다' },
+      ],
+    };
+
+    // 폼 제출 성공 핸들러
+    const onFinish = async (values) => {
+      loading.value = true;
+      try {
+        const response = await axios.post('http://localhost:80/enjoytrip/auth/signup', {
+          email: values.email,
+          password: values.password,
+          name: values.name,
+        });
+
+        if (response.data.code === 'SU') {
+          message.success('회원가입이 완료되었습니다!');
+          // 로그인 페이지로 리다이렉트
+          setTimeout(() => {
+            window.location.href = '/login';
+          }, 1500);
+        } else {
+          throw new Error(response.data.message || '회원가입에 실패했습니다');
+        }
+      } catch (error) {
+        message.error(error.message || '회원가입 처리 중 오류가 발생했습니다');
+      } finally {
+        loading.value = false;
+      }
+    };
+
+    // 폼 제출 실패 핸들러
+    const onFinishFailed = (errorInfo) => {
+      message.error('입력 정보를 다시 확인해주세요');
+      console.log('Failed:', errorInfo);
+    };
+
     return {
-      userEmail: "",
-      userPwd: "",
-      userPwdConfirm: "",
-      userName: "",
+      formState,
+      rules,
+      loading,
+      onFinish,
+      onFinishFailed,
     };
   },
-  methods: {
-    handleSignup() {
-      if (!this.userEmail || !this.userPwd || !this.userPwdConfirm || !this.userName) {
-        alert("모든 필드를 입력해주세요!");
-        return;
-      }
-
-      if (this.userPwd !== this.userPwdConfirm) {
-        alert("비밀번호가 일치하지 않습니다!");
-        return;
-      }
-
-      alert("회원가입 성공!");
-    },
-    validatePassword(_, value) {
-      if (value !== this.userPwd) {
-        return Promise.reject("비밀번호가 일치하지 않습니다!");
-      }
-      return Promise.resolve();
-    },
-  },
-};
+});
 </script>
 
 <style scoped>
-/* NanumSquareNeoLight 폰트 */
 @font-face {
   font-family: 'NanumSquareNeoLight';
   src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-aLt.eot);
-  src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-aLt.eot?#iefix) format("embedded-opentype"), url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-aLt.woff) format("woff"), url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-aLt.ttf) format("truetype");
+  src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-aLt.eot?#iefix) format("embedded-opentype"),
+  url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-aLt.woff) format("woff"),
+  url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-aLt.ttf) format("truetype");
 }
 
-/* 전체 컨테이너 */
 .signup-container {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 100px;
-  height: 100vh;
-  background-color: #ffffff;
+  padding-top: 60px;
+  min-height: 100vh;
+  background-color: rgba(255, 255, 255, 0.9);
 }
 
-/* 배경 이미지 */
 .background-overlay {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
@@ -139,38 +211,50 @@ export default {
   z-index: -1;
 }
 
-/* 제목 */
 .title {
-  font-size: 36px; /* 글씨 크기 키움 */
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 16px;
+  font-size: 36px !important;
+  font-weight: bold !important;
+  color: #333 !important;
+  margin-bottom: 16px !important;
   font-family: 'NanumSquareNeoLight', Arial, sans-serif;
 }
 
-/* 부제목 */
 .subtitle {
-  font-size: 18px; /* 글씨 크기 키움 */
+  font-size: 18px;
   color: #666;
   margin-bottom: 24px;
   font-family: 'NanumSquareNeoLight', Arial, sans-serif;
+  text-align: center;
 }
 
-/* 회원가입 폼 */
 .signup-form {
   width: 100%;
   max-width: 400px;
-  padding: 0 16px;
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* 회원가입 버튼 */
 .submit-button {
   font-weight: bold;
+  height: 40px;
+  font-size: 16px;
   background-color: #ffcc00;
+  border-color: #ffcc00;
 }
 
 .submit-button:hover {
   background-color: #ffa500;
-  color: #333;
+  border-color: #ffa500;
+}
+
+:deep(.ant-form-item-label > label) {
+  font-family: 'NanumSquareNeoLight', Arial, sans-serif;
+  font-weight: 500;
+}
+
+:deep(.ant-input) {
+  font-family: 'NanumSquareNeoLight', Arial, sans-serif;
 }
 </style>

@@ -1,5 +1,6 @@
 package com.enjoytrip.user.model;
 
+import com.enjoytrip.user.constants.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,6 +17,7 @@ public class UserDto {
     private String userPwd;
     private String userName;
     private String createdAt;
+    private Role role;
 
     @Override
     public String toString() {
