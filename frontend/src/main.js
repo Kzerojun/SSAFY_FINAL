@@ -8,9 +8,11 @@ import { UserOutlined, LaptopOutlined, NotificationOutlined } from '@ant-design/
 // Pinia 및 Vue Router 등록
 import { createPinia } from 'pinia';
 import router from './router';
+import { piniaPersistPlugin } from '@/plugins/PininaPlugin';
 
 const pinia = createPinia(); // Pinia 생성
 const app = createApp(App);
+pinia.use(piniaPersistPlugin);
 
 // Ant Design 아이콘 컴포넌트 등록
 app.component('user-outlined', UserOutlined);
