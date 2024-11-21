@@ -7,6 +7,7 @@ import Login from "@/views/Login.vue";
 import Signup from "@/views/Signup.vue";
 import Gatcha from '@/views/Gatcha.vue';
 import Schedule from '@/views/Schedule.vue';
+import MainSearch from "@/views/Travel.vue";
 
 const routes = [
   {
@@ -31,6 +32,7 @@ const routes = [
   { path: '/signup', name: 'signup', component: Signup },
   { path: '/gatcha', name: 'gatcha', component: Gatcha},
   { path: '/schedule', name: 'schedule', component: Schedule},
+  {path : '/search',name :'search',component: MainSearch}
 ];
 
 const router = createRouter({
