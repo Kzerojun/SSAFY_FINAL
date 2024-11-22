@@ -29,6 +29,10 @@
         VALUES (#{userEmail}, #{scheduleName}, #{startDate}, #{endDate})
     </insert>
 
+    <select id="getLastInsertId" resultType="int">
+        SELECT LAST_INSERT_ID()
+    </select>
+
     <select id="listSchedule" parameterType="String" resultMap="schedule">
         SELECT schedule_id, user_email, schedule_name, start_date, end_date, created_at
         FROM schedules
@@ -57,6 +61,14 @@
         VALUES (#{scheduleId}, #{attractionId}, #{sequenceOrder});
     </insert>
 
+    <insert id="createAttractionToScheduleByList">
+        INSERT INTO schedule_attractions (schedule_id, attraction_id, sequence_order)
+        VALUES
+        <foreach collection="attractions" item="attraction" index="index" separator=",">
+            (#{scheduleId}, #{attraction.no}, #{index})
+        </foreach>
+    </insert>
+
     <select id="listScheduleAttractions" parameterType="int" resultMap="scheduleAttraction">
         SELECT sa.schedule_attraction_id, at.title, at.latitude, at.longitude, at.first_image1, at.first_image2, sa.schedule_id, sa.sequence_order, at.addr1, at.addr2
         FROM attractions at
@@ -80,4 +92,5 @@
         DELETE FROM schedule_attractions
         WHERE schedule_attraction_id = #{scheduleAttractionId};
     </delete>
+
 </mapper>

@@ -4,7 +4,9 @@ import com.enjoytrip.schedule.model.dto.AttractionOrderDto;
 import com.enjoytrip.schedule.model.dto.ScheduleAttractionDto;
 import com.enjoytrip.schedule.model.dto.ScheduleAttractionInsertRequestDto;
 import com.enjoytrip.schedule.model.dto.ScheduleDto;
+import com.enjoytrip.trip.model.dto.AttractionDto;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -34,4 +36,9 @@ public interface ScheduleMapper {
     public int updateSequenceOrder(AttractionOrderDto attractionOrderDto) throws SQLException;
 
     public int deleteAttractionFromSchedule(int scheduleAttractionId) throws SQLException;
+
+    public int getLastInsertId() throws SQLException;
+
+    public int createAttractionToScheduleByList(@Param("scheduleId") int scheduleId,
+                                                @Param("attractions") List<AttractionDto> attractions) throws SQLException;
 }

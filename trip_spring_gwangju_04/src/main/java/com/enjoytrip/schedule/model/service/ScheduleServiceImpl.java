@@ -1,9 +1,6 @@
 package com.enjoytrip.schedule.model.service;
 
-import com.enjoytrip.schedule.model.dto.AttractionOrderDto;
-import com.enjoytrip.schedule.model.dto.ScheduleAttractionDto;
-import com.enjoytrip.schedule.model.dto.ScheduleAttractionInsertRequestDto;
-import com.enjoytrip.schedule.model.dto.ScheduleDto;
+import com.enjoytrip.schedule.model.dto.*;
 import com.enjoytrip.schedule.model.mapper.ScheduleMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -48,6 +45,30 @@ public class ScheduleServiceImpl implements ScheduleService {
         scheduleAttractionInsertRequestDto.setSequenceOrder(maxSequence + 1);
 
         return this.scheduleMapper.createAttractionToSchedule(scheduleAttractionInsertRequestDto);
+    }
+
+    @Override
+    @Transactional
+    public int createScheduleWithAttractions(ScheduleWithAttractionsRequestDto scheduleWithAttractionsRequestDto) throws SQLException {
+
+        // 1. 일정 저장
+        ScheduleDto scheduleDto = new ScheduleDto();
+        scheduleDto.setScheduleName(scheduleWithAttractionsRequestDto.getScheduleName());
+        scheduleDto.setStartDate(scheduleWithAttractionsRequestDto.getStartDate());
+        scheduleDto.setEndDate(scheduleWithAttractionsRequestDto.getEndDate());
+        scheduleDto.setUserEmail(scheduleWithAttractionsRequestDto.getUserEmail());
+        this.scheduleMapper.createSchedule(scheduleDto);
+
+        // 2. 금방 생성된 일정 id 조회
+        int scheduleId = this.scheduleMapper.getLastInsertId();
+
+        // 3. 관광지 저장
+        if(scheduleWithAttractionsRequestDto.getAttractions() != null &&
+                !scheduleWithAttractionsRequestDto.getAttractions().isEmpty()) {
+            this.scheduleMapper.createAttractionToScheduleByList(scheduleId, scheduleWithAttractionsRequestDto.getAttractions());
+        }
+
+        return scheduleId;
     }
 
     @Override
