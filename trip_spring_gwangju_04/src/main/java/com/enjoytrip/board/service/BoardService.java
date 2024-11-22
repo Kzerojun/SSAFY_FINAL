@@ -13,4 +13,5 @@ public interface BoardService {
     List<BoardDto> listArticle(Map<String, Object> param);
     void updateArticle(BoardDto boardDto);
     void deleteArticle(int articleNo);
+    List<BoardDto> getAllArticles();
 }
