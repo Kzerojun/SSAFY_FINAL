@@ -124,6 +124,8 @@
   import axios from "axios";
   import { reactive, ref, computed, watch } from "vue";
   import {message} from "ant-design-vue";
+  import apiClient from '@/api/apiClient'
+  import { useRouter } from 'vue-router';
 
   export default {
     name: "DragDropSchedule",
@@ -142,6 +144,8 @@
       startDate: '',
       endDate: ''
     });
+
+    const router = useRouter();
 
     const isSearchEnabled = computed(() => selectedSido.value && selectedGugun.value);
 
@@ -255,24 +259,33 @@
 
       const createSchedule = async () => {
         try {
-          const response = await axios.post('http://localhost:80/enjoytrip/schedule', {
-            userEmail: 'user@email.com', // TODO: 실제 사용자 이메일로 교체
+          // 선택된 관광지 리스트를 일정 생성 요청에 포함
+          const payload = {
             scheduleName: scheduleForm.scheduleName,
             startDate: scheduleForm.startDate,
-            endDate: scheduleForm.endDate
-          });
+            endDate: scheduleForm.endDate,
+            attractions: selectedPlaces.map((place, index) => ({
+              no: place.no,
+              sequenceOrder: index,
+            })),
+          };
 
-          const scheduleId = response.data.scheduleId;
+          // 일정과 관광지 리스트를 함께 전송
+          const response = await apiClient.post('http://localhost:80/enjoytrip/schedule/with-attractions', payload);
 
-          for (let i = 0; i < selectedPlaces.length; i++) {
-            await axios.post(`http://localhost:80/enjoytrip/schedule/${scheduleId}/attractions`, {
-              contentId: selectedPlaces[i].contentId
-            });
+          if (response.data.code === 'SU') {
+            const scheduleId = response.data.scheduleId;  // 수정된 부분: 최상위 레벨에서 scheduleId 접근
+            console.log('생성된 일정 ID:', scheduleId);
+            
+            message.success('일정이 생성되었습니다!');
+            selectedPlaces.splice(0, selectedPlaces.length);
+            closeModal();
+
+            // 리다이렉트
+            router.push(`/schedule/${scheduleId}/attractions`);
+          } else {
+            throw new Error(response.data.message || '일정 생성에 실패했습니다.');
           }
-
-          message.success('일정이 생성되었습니다!');
-          selectedPlaces.splice(0, selectedPlaces.length);
-          closeModal();
         } catch (error) {
           console.error('일정 생성 실패:', error);
           message.error('일정 생성에 실패했습니다.');

@@ -3,12 +3,13 @@ package com.enjoytrip.schedule.controller;
 import com.enjoytrip.global.Code;
 import com.enjoytrip.global.Message;
 import com.enjoytrip.global.ResponseDto;
-import com.enjoytrip.jwt.service.JwtTokenExtractor;
 import com.enjoytrip.jwt.service.JwtTokenFactory;
 import com.enjoytrip.schedule.model.dto.*;
 import com.enjoytrip.schedule.model.service.ScheduleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
@@ -20,14 +21,14 @@ import java.util.List;
 public class ScheduleController {
 
     private final ScheduleService scheduleService;
-    //private final JwtTokenFactory jwtTokenFactory;
+    private final JwtTokenFactory jwtTokenFactory;
 
     @PostMapping()
     public ResponseEntity<ResponseDto> createSchedule(@RequestBody ScheduleDto scheduleDto)
         throws SQLException {
 
-        // TODO: 토큰에서 userEmail을 가져와 세팅
-        //scheduleDto.setScheduleId();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        scheduleDto.setUserEmail(authentication.getName());
 
         this.scheduleService.createSchedule(scheduleDto);
 
@@ -39,12 +40,13 @@ public class ScheduleController {
         return ResponseEntity.ok(responseDto);
     }
 
-    // TODO : 일단은 userEmail로 test하고, 이후 Token으로 request 수정
     @GetMapping()
-    public ResponseEntity<ListScheduleResponseDto> listSchedule(@RequestParam String userEmail)
+    public ResponseEntity<ListScheduleResponseDto> listSchedule()
         throws SQLException {
 
-        List<ScheduleDto> scheduleDtos = scheduleService.listSchedule(userEmail);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        List<ScheduleDto> scheduleDtos = scheduleService.listSchedule(authentication.getName());
 
         ListScheduleResponseDto listScheduleResponseDto = new ListScheduleResponseDto(
                 Code.SUCCESS,
@@ -96,6 +98,31 @@ public class ScheduleController {
                 Code.SUCCESS,
                 Message.SUCCESS
         );
+
+        return ResponseEntity.ok(responseDto);
+    }
+
+    @PostMapping("/with-attractions")
+    public ResponseEntity<ResponseDto> createScheduleWithAttractions(
+            @RequestBody ScheduleWithAttractionsRequestDto scheduleWithAttractionsRequestDto) throws SQLException {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        scheduleWithAttractionsRequestDto.setUserEmail(authentication.getName());
+
+        // Test Code
+        System.out.println("USER: " + authentication.getName());
+        System.out.println("USER: " + scheduleWithAttractionsRequestDto.getUserEmail());
+
+        int scheduleId = this.scheduleService.createScheduleWithAttractions(scheduleWithAttractionsRequestDto);
+
+        ScheduleWithAttractionsResponseDto responseDto = new ScheduleWithAttractionsResponseDto(
+                Code.SUCCESS,
+                Message.SUCCESS,
+                scheduleId
+        );
+
+        // Test Code
+        System.out.println("RESPONSE schedule_id: " + responseDto.getScheduleId());
 
         return ResponseEntity.ok(responseDto);
     }

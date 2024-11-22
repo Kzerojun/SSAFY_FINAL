@@ -26,6 +26,7 @@
   import { ref, onMounted } from 'vue';
   import axios from 'axios';
   import { useRouter } from 'vue-router';
+  import apiClient from '@/api/apiClient'
 
   // 여행 일정 상태
   const schedules = ref<any[]>([]);
@@ -36,8 +37,8 @@
   // 서버로부터 일정 데이터를 불러오는 함수
   const fetchSchedules = async () => {
     try {
-      // 하드코딩된 테스트용 이메일
-      const response = await axios.get('http://localhost:80/enjoytrip/schedule?userEmail=inju@naver.com');
+      // 토큰을 포함한 요청 전송
+      const response = await apiClient.get('http://localhost:80/enjoytrip/schedule');
       
       // 응답 데이터가 'schedules' 배열에 있어야 함
       if (response.data && response.data.schedules) {

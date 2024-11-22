@@ -3,7 +3,10 @@ package com.enjoytrip.board.controller;
 import java.util.List;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import com.enjoytrip.board.model.dto.BoardDto;
@@ -25,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/board")
 @RequiredArgsConstructor
+@Slf4j
 public class BoardController {
 
     private final BoardService boardService;
@@ -40,6 +44,10 @@ public class BoardController {
     public ResponseEntity<? extends ResponseDto> write(
             @Parameter(description = "게시글 작성 정보", required = true) 
             @RequestBody WriteBoardRequest writeBoardRequest) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        writeBoardRequest.setUserEmail(authentication.getName());
+        log.info(writeBoardRequest.getUserEmail());
         WriteBoardResponse response = boardService.writeBoard(writeBoardRequest);
         return ResponseEntity.ok(response);
     }
@@ -101,4 +109,16 @@ public class BoardController {
         boardService.deleteArticle(articleNo);
         return ResponseEntity.ok().build();
     }
+
+    @Operation(summary = "모든 게시글 조회", description = "모든 게시글을 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "게시글 조회 성공"),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
+    @GetMapping("/all")
+    public ResponseEntity<List<BoardDto>> getAllArticles() {
+        List<BoardDto> articles = boardService.getAllArticles();
+        return ResponseEntity.ok(articles);
+    }
+
 }
