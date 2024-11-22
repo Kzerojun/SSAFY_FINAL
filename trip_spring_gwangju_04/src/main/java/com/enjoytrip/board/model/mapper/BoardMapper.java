@@ -25,4 +25,6 @@ public interface BoardMapper {
     
     // 삭제
     void deleteArticle(int articleNo) throws SQLException;
+
+    List<BoardDto> getAllArticles();
 }

@@ -75,4 +75,8 @@ public class BoardServiceImpl implements BoardService {
             throw new RuntimeException("게시글 삭제 중 오류가 발생했습니다.", e);
         }
     }
+    public List<BoardDto> getAllArticles() {
+        return boardMapper.getAllArticles();
+    }
+
 }

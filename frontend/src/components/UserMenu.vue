@@ -2,7 +2,6 @@
   <div class="profile-container" v-if="isLoggedIn">
     <!-- 사용자 정보 섹션 -->
     <a-card class="user-info-card" bordered @click="toggleMenu">
-      <a-avatar></a-avatar>
       <div class="user-profile">
         <div class="user-details">
           <p class="username">{{ authStore.email}}</p>

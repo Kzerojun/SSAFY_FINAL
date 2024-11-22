@@ -2,6 +2,7 @@ import { createApp } from 'vue';
 import App from './App.vue';
 import 'ant-design-vue/dist/reset.css';
 
+
 // Ant Design Vue 아이콘 등록
 import { UserOutlined, LaptopOutlined, NotificationOutlined } from '@ant-design/icons-vue';
 
