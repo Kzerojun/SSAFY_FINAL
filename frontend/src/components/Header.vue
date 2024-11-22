@@ -42,7 +42,7 @@
         <span @click = "search">여행 일정 만들기</span>
         <UserMenu />
         <UserOutlined class="icon" v-if="!isLoggedIn"  @click = "login"/>
-        <ClockCircleOutlined class="icon" />
+        <NotificationOutlined class = "icon"  @click = "notify"/>
       </nav>
     </div>
 
@@ -52,7 +52,7 @@
 
 <script lang="ts" setup>
 import { Layout } from 'ant-design-vue';
-import { UserOutlined, ClockCircleOutlined } from '@ant-design/icons-vue';
+import { UserOutlined,NotificationOutlined } from '@ant-design/icons-vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth'; // Pinia Auth Store import
 import UserMenu from "@/components/UserMenu.vue";
@@ -79,7 +79,9 @@ const schedule = () => {
   router.push({ name : 'schedule' })
 }
 
-
+const notify = () =>{
+  router.push({name:'notify'})
+}
 
 const search = () => {
   router.push({ name : 'search' })
