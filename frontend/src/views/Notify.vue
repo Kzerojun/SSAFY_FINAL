@@ -156,7 +156,7 @@ export default defineComponent({
           content: formState.content,
         };
 
-        const response = await apiClient.post("/board/write", requestBody, {
+        await apiClient.post("/board/write", requestBody, {
           headers: {
             "Content-Type": "application/json",
           },

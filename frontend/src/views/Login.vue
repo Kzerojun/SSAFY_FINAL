@@ -287,7 +287,7 @@ export default defineComponent({
   font-weight: 500;
 }
 
-:deep(.ant-input) {
+:deep() {
   font-family: Arial, sans-serif;
 }
 </style>
