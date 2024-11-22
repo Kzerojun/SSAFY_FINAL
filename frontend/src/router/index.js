@@ -10,6 +10,7 @@ import MainSearch from "@/views/Travel.vue";
 import Schedule from '@/views/ScheduleList.vue';
 import ScheduleAttraction from '@/views/ScheduleAttraction.vue';
 import Notify from "@/views/Notify.vue";
+import Mypage from "@/views/Mypage.vue";
 
 const routes = [
   {
@@ -40,7 +41,9 @@ const routes = [
     name: 'schedule-attractions',
     component: ScheduleAttraction,
     props: true,
-  },
+  },{
+    path : '/mypage',name : 'mypage',component: Mypage
+  }
 ];
 
 const router = createRouter({
