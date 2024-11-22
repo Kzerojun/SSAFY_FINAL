@@ -1,12 +1,12 @@
 package com.enjoytrip.user.model.service;
 
-import java.sql.SQLException;
-import java.util.List;
-
 import com.enjoytrip.user.model.dto.UserDto;
+import java.sql.SQLException;
 
 public interface UserService {
-	
+
+	void updateProfileImage(String userEmail, String profileImage) throws SQLException;
+
 	void registerUser(UserDto userDto) throws SQLException;
 	
 	UserDto loginUser(UserDto userDto) throws SQLException;

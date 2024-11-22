@@ -9,7 +9,8 @@
 		<result column="user_email" property="userEmail"/>
 		<result column="user_pwd" property="userPwd"/>
 		<result column="user_name" property="userName"/>
-		<result column="created_at" property="createdAt"/>		
+		<result column="created_at" property="createdAt"/>
+		<result column="profile_image" property="profileImage"/>
 	</resultMap>
 
 	<select id="loginUser" parameterType="userDto" resultMap="user">
@@ -22,5 +23,21 @@
 		insert into users (user_email, user_pwd, user_name)
 		values (#{userEmail}, #{userPwd}, #{userName})
 	</insert>
-	
+
+	<update id="updateProfileImage">
+		update users
+		set profile_image = #{profileImage}
+		where user_email = #{userEmail}
+	</update>
+
+	<resultMap id="userResultMap" type="com.enjoytrip.user.model.dto.UserDto">
+		<result column="user_no" property="userNo" />
+		<result column="user_email" property="userEmail" />
+		<result column="user_pwd" property="userPwd" />
+		<result column="user_name" property="userName" />
+		<result column="created_at" property="createdAt" />
+		<result column="role" property="role" />
+	</resultMap>
+
+
 </mapper>

@@ -1,9 +1,7 @@
 package com.enjoytrip.security.service;
 
 import com.enjoytrip.auth.model.mapper.AuthMapper;
-import com.enjoytrip.user.constants.Role;
 import com.enjoytrip.user.model.dto.UserDto;
-import com.enjoytrip.user.model.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
