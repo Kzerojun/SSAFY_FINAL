@@ -3,9 +3,11 @@
     <div class="sidebar">
       <DragDropSchedule @schedule-created="handleScheduleCreated"/>
     </div>
+    <!--
     <div class="map-container">
-      <KakaoMap />
+      <KakaoMap :locations="[]" />
     </div>
+    -->
   </div>
 </template>
 
@@ -29,7 +31,7 @@ export default {
 }
 
 .sidebar {
-  width: 80%;
+  width: 100%;
   height: 100%;
   padding: 10px;
   overflow-y: auto;
