@@ -1,6 +1,7 @@
 <template>
   <div class="slot-machine">
     <div class="frame">
+
       <div class="slots">
         <Slot
           v-for="(slot, index) in slots"
@@ -259,17 +260,17 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 40px;
 }
 
 .frame {
   display: flex;
   align-items: flex-start;
-  background: linear-gradient(to bottom, #b8860b, #f0e68c);
+  /*background: linear-gradient(to bottom, #b8860b, #f0e68c);*/
+  background-image: url('../../assets/slot-background.jpg');
   padding: 30px;
   border-radius: 15px;
   box-shadow: 0 0 50px rgba(0, 0, 0, 0.7);
-  border: 5px solid #ffd700;
+  border: 5px solid #f4d03f;
 }
 
 .slots {
