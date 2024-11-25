@@ -1,7 +1,7 @@
-  <template>
+<template>
     <div class="place-selector">
       <div class="place-list-container">
-        <h2>우리와 함께 여행하자</h2>
+        <h2>관광지 검색</h2>
 
         <!-- 검색 필터 -->
         <div class="filters">
@@ -93,6 +93,12 @@
         </div>
       </div>
 
+      <!-- 오른쪽: 지도 영역 -->
+      <div class="right-section">
+        <KakaoMap :locations="mapLocations" />
+      </div>
+
+
       <!-- 일정 생성 모달 -->
     <div v-if="showModal" class="modal-overlay" @click="closeModal">
         <div class="modal-content" @click.stop>
@@ -122,14 +128,18 @@
 
   <script>
   import axios from "axios";
-  import { reactive, ref, computed, watch } from "vue";
+  import { reactive, ref, computed, watch, onMounted } from "vue";
   import {message} from "ant-design-vue";
   import apiClient from '@/api/apiClient'
   import { useRouter } from 'vue-router';
+  import KakaoMap from "./KakaoMap.vue";
 
   export default {
     name: "DragDropSchedule",
-    setup() {
+    components: {
+      KakaoMap
+    },
+    setup(props, { emit }) {
     const sidos = reactive([]);
     const guguns = reactive([]);
     const selectedSido = ref("");
@@ -139,6 +149,7 @@
     const searchResults = reactive([]);
     const selectedPlaces = reactive([]);
     const showModal = ref(false);
+    const mapLocations = ref([]); // 추가된 부분
     const scheduleForm = reactive({
       scheduleName: '',
       startDate: '',
@@ -224,25 +235,39 @@
           return;
         }
 
-        const url = "http://localhost:80/enjoytrip/trip/search"; // 백엔드 엔드포인트 URL
+        const url = "http://localhost:80/enjoytrip/trip/search";
         const params = {
           sido: selectedSido.value,
           gugun: selectedGugun.value,
-          content: selectedContentType.value, // 추가된 contentType
+          content: selectedContentType.value,
         };
 
         console.log("검색 요청 데이터:", params);
 
         axios
-            .get(url, { params })
-            .then((response) => {
-              console.log("검색 성공:", response.data); // 응답 데이터 로깅
-              searchResults.splice(0, searchResults.length, ...(response.data.attractions || []));
-            })
-            .catch((error) => {
-              console.error("관광지 검색 실패:", error); // 오류 로그 출력
-            });
+          .get(url, { params })
+          .then((response) => {
+            console.log("검색 성공:", response.data);
+            searchResults.splice(0, searchResults.length, ...(response.data.attractions || []));
+            
+           // mapLocations 업데이트
+            mapLocations.value = response.data.attractions.map(attraction => ({
+              latitude: attraction.latitude,
+              longitude: attraction.longitude,
+              title: attraction.title,
+              addr1: attraction.addr1,
+              contentId: attraction.contentId
+            }));
+            
+            console.log("지도 위치 업데이트:", mapLocations.value);
+          })
+          .catch((error) => {
+            console.error("관광지 검색 실패:", error);
+            message.error("관광지 검색에 실패했습니다.");
+            mapLocations.value = [];
+          });
       };
+
 
       const showCreateScheduleModal = () => {
         showModal.value = true;
@@ -335,6 +360,7 @@
         showCreateScheduleModal,
         closeModal,
         createSchedule,
+        mapLocations, // 추가된 부분
         contentTypes: [
           { id: 12, name: "관광지" },
           { id: 14, name: "문화시설" },
@@ -351,191 +377,285 @@
   </script>
 
 
-  <style scoped>
+<style scoped>
+.place-selector {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 20px;
+  padding: 20px;
+  height: calc(100vh - 150px);
+  box-sizing: border-box;
+}
+
+.place-list-container,
+.selected-places-container,
+.right-section {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  height: 100%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.filters {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.filters select,
+.filters button {
+  width: 100%;
+  height: 40px;
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  background-color: white;
+}
+
+.filters button {
+  background-color: #f4d03f;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.filters button:disabled {
+  background-color: #d9d9d9;
+  cursor: not-allowed;
+}
+
+.place-list {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+.selected-places-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.selected-places-container h2 {
+  margin-bottom: 10px;
+}
+
+.create-schedule-btn {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  background-color: #f4d03f;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.create-schedule-btn:disabled {
+  background-color: #d9d9d9;
+  cursor: not-allowed;
+}
+
+.selected-places {
+  flex: 1;
+  width: 100%;
+  border: 1px dashed #d9d9d9;
+  border-radius: 8px;
+  padding: 10px;
+  background-color: #f9f9f9;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.place-card {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  background-color: white;
+  cursor: grab;
+  margin-bottom: 10px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.place-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.selected-place-card {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  background-color: white;
+  width: calc(100% - 24px);
+}
+
+.place-image {
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.place-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.place-info h3 {
+  margin: 0 0 5px;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.place-info p {
+  margin: 0;
+  font-size: 12px;
+  color: #666;
+}
+
+
+/* 스크롤바 스타일링 */
+.place-list::-webkit-scrollbar,
+.selected-places::-webkit-scrollbar {
+  width: 6px;
+}
+
+.place-list::-webkit-scrollbar-thumb,
+.selected-places::-webkit-scrollbar-thumb {
+  background-color: #d9d9d9;
+  border-radius: 3px;
+}
+
+.place-list::-webkit-scrollbar-track,
+.selected-places::-webkit-scrollbar-track {
+  background-color: #f5f5f5;
+}
+
+.delete-button {
+  background-color: 1890ff;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 1200px) {
   .place-selector {
-    display: flex;
-    gap: 30px;
-    padding: 20px;
-    height: 80vh;
-    box-sizing: border-box;
+    grid-template-columns: 1fr;
+    height: auto;
   }
 
-  .place-list-container,
-  .selected-places-container {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
+  .right-section {
+    height: 400px;
   }
+}
 
-  .filters {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-  }
+/* 모달 관련 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999; /* 더 높은 z-index 값 설정 */
+}
 
+.modal-content {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  min-width: 400px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  position: relative; /* position 추가 */
+  z-index: 10000; /* modal-overlay보다 높은 z-index */
+}
 
-  .filters select,
-  .filters button {
-    padding: 5px; /* 기존보다 작게 설정 */
-    font-size: 12px; /* 글자 크기 축소 */
-    width: 100px; /* 너비 설정 */
-    height: 50px;
-    border: 1px solid #d9d9d9;
-    border-radius: 4px;
-  }
+.modal-content h2 {
+  margin: 0 0 20px 0;
+  font-size: 20px;
+  font-weight: bold;
+}
 
-  .filters button {
-    background-color: #1890ff;
-    color: white;
-    cursor: pointer;
-  }
+.form-group {
+  margin-bottom: 20px;
+}
 
-  .filters button:disabled {
-    background-color: #d9d9d9;
-    cursor: not-allowed;
-  }
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #333;
+}
 
-  .place-list {
-    flex: 1;
-    overflow-y: auto;
-    gap : 10px;
-  }
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.3s;
+}
 
-  .place-card {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    padding: 10px;
-    border: 1px solid #d9d9d9;
-    border-radius: 8px;
-    background-color: #ffffff;
-    cursor: grab;
-    margin-bottom: 20px;
-  }
+.form-group input:focus {
+  outline: none;
+  border-color: #f4d03f;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
 
-  .place-image {
-    width: 100px;
-    height: 100px;
-    border-radius: 8px;
-    object-fit: cover;
-  }
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
 
-  .selected-places {
-    min-height: 300px;
-    border: 1px dashed #d9d9d9;
-    border-radius: 8px;
-    padding: 10px;
-    background-color: #f9f9f9;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    overflow-y: auto;
-  }
+.modal-buttons button {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
 
-  .selected-place-card {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    width: 300px;
-    height: 150px;
-    padding: 10px;
-    border: 1px solid #d9d9d9;
-    border-radius: 8px;
-    background-color: #ffffff;
-  }
+.modal-buttons button[type="submit"] {
+  background-color: #f4d03f;
+  color: white;
+  border: none;
+}
 
-  .delete-button {
-    background-color: #ff4d4f;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    font-size: 16px;
-    cursor: pointer;
-  }
+.modal-buttons button[type="submit"]:hover {
+  background-color: #f4d03f;
+}
 
-  .delete-button:hover {
-    background-color: #ff7875;
-  }
+.modal-buttons button[type="button"] {
+  background-color: white;
+  border: 1px solid #d9d9d9;
+  color: #666;
+}
 
-  .bottom-controls {
-    margin-top: 20px;
-    display: flex;
-    justify-content: center;
-  }
-
-  .create-schedule-btn {
-    padding: 10px 20px;
-    background-color: #1890ff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-
-  .create-schedule-btn:disabled {
-    background-color: #d9d9d9;
-    cursor: not-allowed;
-  }
-
-  .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-  }
-
-  .modal-content {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    min-width: 300px;
-  }
-
-  .form-group {
-    margin-bottom: 15px;
-  }
-
-  .form-group label {
-    display: block;
-    margin-bottom: 5px;
-  }
-
-  .form-group input {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #d9d9d9;
-    border-radius: 4px;
-  }
-
-  .modal-buttons {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 20px;
-  }
-
-  .modal-buttons button {
-    padding: 8px 16px;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-
-  .modal-buttons button[type="submit"] {
-    background-color: #1890ff;
-    color: white;
-    border: none;
-  }
-
-  .modal-buttons button[type="button"] {
-    background-color: white;
-    border: 1px solid #d9d9d9;
-  }
+.modal-buttons button[type="button"]:hover {
+  color: #f4d03f;
+  border-color: #f4d03f;
+}
 </style>
