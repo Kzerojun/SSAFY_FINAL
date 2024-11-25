@@ -35,9 +35,16 @@
           </button>
         </div>
 
-        <!-- 기존 예시 카드 및 검색 결과 -->
+        <!-- 검색 결과 섹션 -->
         <div class="place-list">
+          <!-- 검색 결과가 없을 때 표시할 메시지 -->
+          <div v-if="hasSearched && combinedPlaces.length === 0" class="no-results">
+            검색된 여행지가 없습니다.
+          </div>
+          
+          <!-- 검색 결과가 있을 때 표시할 카드들 -->
           <div
+              v-else
               class="place-card"
               v-for="(place, index) in combinedPlaces"
               :key="index"
@@ -150,6 +157,7 @@
     const selectedPlaces = reactive([]);
     const showModal = ref(false);
     const mapLocations = ref([]); // 추가된 부분
+    const hasSearched = ref(false);
     const scheduleForm = reactive({
       scheduleName: '',
       startDate: '',
@@ -235,6 +243,8 @@
           return;
         }
 
+        hasSearched.value = true;  // 검색 시도 시 true로 설정
+
         const url = "http://localhost:80/enjoytrip/trip/search";
         const params = {
           sido: selectedSido.value,
@@ -250,7 +260,6 @@
             console.log("검색 성공:", response.data);
             searchResults.splice(0, searchResults.length, ...(response.data.attractions || []));
             
-           // mapLocations 업데이트
             mapLocations.value = response.data.attractions.map(attraction => ({
               latitude: attraction.latitude,
               longitude: attraction.longitude,
@@ -360,6 +369,7 @@
         showCreateScheduleModal,
         closeModal,
         createSchedule,
+        hasSearched,
         mapLocations, // 추가된 부분
         contentTypes: [
           { id: 12, name: "관광지" },
@@ -553,6 +563,17 @@
 
 .delete-button {
   background-color: 1890ff;
+}
+
+.no-results {
+  width: 100%;
+  padding: 2rem;
+  text-align: center;
+  color: #666;
+  font-size: 1.1rem;
+  background: #f5f5f5;
+  border-radius: 8px;
+  margin: 1rem 0;
 }
 
 /* 반응형 디자인 */
