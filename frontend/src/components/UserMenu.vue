@@ -2,7 +2,6 @@
   <div class="profile-container" v-if="isLoggedIn">
     <!-- 사용자 정보 섹션 -->
     <a-card class="user-info-card" bordered @click="toggleMenu">
-      <a-avatar></a-avatar>
       <div class="user-profile">
         <div class="user-details">
           <p class="username">{{ authStore.email}}</p>
@@ -27,7 +26,8 @@
 <script lang="ts" setup>
 import {ref, computed, onMounted} from 'vue';
 import { WalletOutlined, FileTextOutlined } from '@ant-design/icons-vue';
-import { useAuthStore } from '@/stores/auth'; // Pinia Auth Store import
+import { useAuthStore } from '@/stores/auth';
+import {useRouter} from "vue-router"; // Pinia Auth Store import
 
 // Pinia Auth Store 사용
 const authStore = useAuthStore();
@@ -50,6 +50,7 @@ onMounted(() => {
 
 // 메뉴 표시 여부 상태
 const isMenuVisible = ref(false);
+const router = useRouter();
 
 // 메뉴 표시 토글 함수
 const toggleMenu = () => {
@@ -61,7 +62,12 @@ const handleMenuClick = (item) => {
   if (item.label === '로그아웃') {
     authStore.clearAuth(); // Pinia의 clearAccessToken 호출
   }
+  if(item.label === '내정보') {
+    router.push({ name : 'mypage' })
+  }
 };
+
+
 </script>
 
 <style scoped>

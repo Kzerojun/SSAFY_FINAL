@@ -4,7 +4,7 @@
       <DragDropSchedule @schedule-created="handleScheduleCreated"/>
     </div>
     <div class="map-container">
-      <KakaoMap :attractions="searchResults" />
+      <KakaoMap />
     </div>
   </div>
 </template>

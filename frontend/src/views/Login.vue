@@ -187,6 +187,7 @@ export default defineComponent({
   position: relative;
   z-index: 2;
   width: 500px;
+  height: 500px;
   padding: 24px;
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
@@ -286,7 +287,7 @@ export default defineComponent({
   font-weight: 500;
 }
 
-:deep(.ant-input) {
+:deep() {
   font-family: Arial, sans-serif;
 }
 </style>

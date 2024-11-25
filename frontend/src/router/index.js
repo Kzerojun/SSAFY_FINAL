@@ -9,6 +9,8 @@ import Gatcha from '@/views/Gatcha.vue';
 import MainSearch from "@/views/Travel.vue";
 import Schedule from '@/views/ScheduleList.vue';
 import ScheduleAttraction from '@/views/ScheduleAttraction.vue';
+import Notify from "@/views/Notify.vue";
+import Mypage from "@/views/Mypage.vue";
 
 const routes = [
   {
@@ -33,13 +35,15 @@ const routes = [
   { path: '/signup', name: 'signup', component: Signup },
   { path: '/gatcha', name: 'gatcha', component: Gatcha},
   { path: '/schedule', name: 'schedule', component: Schedule},
-
+  {path :'/notify', name :'notify', component: Notify},
   { path : '/search',name :'search',component: MainSearch},
   { path: '/schedule/:scheduleId/attractions', 
     name: 'schedule-attractions',
     component: ScheduleAttraction,
     props: true,
-  },
+  },{
+    path : '/mypage',name : 'mypage',component: Mypage
+  }
 ];
 
 const router = createRouter({

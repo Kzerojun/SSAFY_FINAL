@@ -1,9 +1,8 @@
 package com.enjoytrip.interceptor;
 
+import com.enjoytrip.user.model.dto.UserDto;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
-
-import com.enjoytrip.user.model.dto.UserDto;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

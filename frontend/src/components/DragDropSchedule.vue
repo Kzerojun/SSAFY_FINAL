@@ -237,7 +237,7 @@
             .get(url, { params })
             .then((response) => {
               console.log("검색 성공:", response.data); // 응답 데이터 로깅
-              places.value = response.data.attractions
+              searchResults.splice(0, searchResults.length, ...(response.data.attractions || []));
             })
             .catch((error) => {
               console.error("관광지 검색 실패:", error); // 오류 로그 출력
