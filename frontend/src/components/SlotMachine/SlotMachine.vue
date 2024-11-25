@@ -1,38 +1,95 @@
 <template>
-  <div class="slot-machine">
-    <div class="frame">
-
-      <div class="slots">
-        <Slot
-          v-for="(slot, index) in slots"
-          :key="index"
-          :title="slot.title"
-          :items="slot.items"
-          :index="index"
-          :isActive="currentSlotIndex === index"
-          :ref="el => slotRefs[index] = el"
-          @finish="handleSlotFinish"
-        />
+  <div class="slot-machine-container">
+    <!-- 초기 안내 모달 -->
+    <div v-if="showWelcomeModal" class="modal-overlay" @click="closeWelcomeModal">
+      <div class="modal-content welcome-modal" @click.stop>
+        <h2>랜덤 여행지 뽑기</h2>
+        <p>슬롯 머신으로 랜덤 여행지를 뽑아 특별한 추억을 만들어 보세요!</p>
+        <button class="primary-button" @click="closeWelcomeModal">시작하기</button>
       </div>
-      <div class="lever-container">
-        <div 
-          class="lever"
-          :class="{ 'pulled': isLeverPulled }"
-          ref="lever"
-          @mousedown="startDrag"
-          :style="leverStyle"
-        >
-          <div class="lever-handle"></div>
-          <div class="lever-stem"></div>
-          <div class="lever-base"></div>
+    </div>
+
+    <!-- 일정 생성 모달 (finalizeSchedule 클릭 시 표시) -->
+    <div v-if="showScheduleModal" class="modal-overlay" @click="closeScheduleModal">
+      <div class="modal-content schedule-modal" @click.stop>
+        <h2>새 랜덤 일정 만들기</h2>
+        <form @submit.prevent="createFinalSchedule">
+          <div class="form-group">
+            <label>일정 이름</label>
+            <input v-model="scheduleForm.scheduleName" type="text" required>
+          </div>
+          <div class="form-group">
+            <label>시작 날짜</label>
+            <input v-model="scheduleForm.startDate" type="date" required>
+          </div>
+          <div class="form-group">
+            <label>종료 날짜</label>
+            <input v-model="scheduleForm.endDate" type="date" required>
+          </div>
+          <div class="modal-buttons">
+            <button type="submit">완료</button>
+            <button type="button" @click="closeScheduleModal">취소</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 슬롯 머신 -->
+    <div class="slot-machine">
+      <div class="frame">
+        <div class="slots">
+          <Slot
+            v-for="(slot, index) in slots"
+            :key="index"
+            :title="slot.title"
+            :items="slot.items"
+            :index="index"
+            :isActive="currentSlotIndex === index"
+            :ref="el => slotRefs[index] = el"
+            @finish="handleSlotFinish"
+          />
+        </div>
+        <div class="lever-container">
+          <div 
+            class="lever"
+            :class="{ 'pulled': isLeverPulled }"
+            ref="lever"
+            @mousedown="startDrag"
+            :style="leverStyle"
+          >
+            <div class="lever-handle"></div>
+            <div class="lever-stem"></div>
+            <div class="lever-base"></div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- 모달 컴포넌트 -->
-    <div v-if="showModal" class="modal-overlay" @click="closeModal">
+    <!-- 선택된 관광지 목록 -->
+    <div class="selected-attractions">
+      <h3>선택된 관광지</h3>
+      <div class="attractions-list">
+        <div v-for="(attraction, index) in selectedAttractions" :key="index" class="attraction-item">
+          <img :src="attraction.firstImage1 || '/placeholder.jpg'" :alt="attraction.title">
+          <div class="attraction-details">
+            <h4>{{ attraction.title }}</h4>
+            <p>{{ attraction.addr1 }}</p>
+          </div>
+        </div>
+      </div>
+      <button 
+        class="create-schedule-button" 
+        @click="finalizeSchedule"
+        :disabled="selectedAttractions.length === 0"
+      >
+        일정 생성하기
+      </button>
+    </div>
+
+    <!-- 관광지 상세 모달 -->
+    <div v-if="showAttractionModal" class="modal-overlay" @click="closeAttractionModal">
       <div class="modal-content" @click.stop>
-        <button class="close-button" @click="closeModal">&times;</button>
+        <button class="close-button" @click="closeAttractionModal">&times;</button>
         
         <div class="attraction-info">
           <h2>{{ attractionData.title }}</h2>
@@ -64,7 +121,9 @@
             <p>{{ attractionData.overview }}</p>
           </div>
 
-          <button class="add-button" @click="addToSchedule">내 일정에 추가</button>
+          <div class="modal-buttons">
+            <button class="add-button" @click="addToSchedule">내 일정에 추가</button>
+          </div>
         </div>
       </div>
     </div>
@@ -72,20 +131,48 @@
 </template>
 
 <script>
-import { useRegionStore } from '@/stores/regionStore';
+import { ref, reactive, computed } from 'vue';
+import { useRouter } from 'vue-router';
 import axios from 'axios';
+import { message } from 'ant-design-vue';
 import Slot from './Slot.vue';
+import { useRegionStore } from '@/stores/regionStore';
+import apiClient from '@/api/apiClient';
 
 export default {
   components: { Slot },
   
   setup() {
+    const router = useRouter();
     const regionStore = useRegionStore();
-    return { regionStore };
+    
+    return { 
+      regionStore,
+      router 
+    };
   },
+
+  computed: {
+    leverStyle() {
+      return {
+        transform: `translateY(${this.leverPosition}px)`,
+        transition: this.isDragging ? 'none' : 'transform 0.5s ease-out'
+      };
+    }
+  },
+
 
   data() {
     return {
+      showWelcomeModal: true,
+      showScheduleModal: false,
+      showAttractionModal: false,
+      scheduleForm: {
+        scheduleName: '',
+        startDate: '',
+        endDate: ''
+      },
+      selectedAttractions: [],
       slots: [
         { title: "시도", items: [], selectedValue: null },
         { title: "구군", items: [], selectedValue: null },
@@ -99,21 +186,107 @@ export default {
       startY: 0,
       currentY: 0,
       leverPosition: 0,
-      showModal: false,
       attractionData: null,
     };
   },
 
-  computed: {
-    leverStyle() {
-      return {
-        transform: `translateY(${this.leverPosition}px)`,
-        transition: this.isDragging ? 'none' : 'transform 0.5s ease-out'
-      };
-    }
-  },
-
   methods: {
+    // 웰컴 모달 관련 메소드 수정
+    closeWelcomeModal() {
+      this.showWelcomeModal = false;
+      this.slots[0].items = this.regionStore.sidoOptions; // 시도 옵션만 초기화
+    },
+
+    async start() {
+      if (this.isStarting) return;
+
+      this.isStarting = true;
+      this.currentSlotIndex = 0;
+      this.slots.forEach(slot => {
+        slot.selectedValue = null;
+      });
+
+      if (this.slots[0].items.length === 0) {
+        this.slots[0].items = this.regionStore.sidoOptions;
+      }
+
+      this.$nextTick(() => {
+        this.startSlot(0);
+      });
+    },
+
+    // 슬롯 머신 활성화
+    enableSlotMachine() {
+      this.slots[0].items = this.regionStore.sidoOptions;
+      // 필요한 초기화 작업 수행
+    },
+
+    // 일정 생성 관련 메소드
+    async finalizeSchedule() {
+      // 일정 생성 모달 표시
+      this.showScheduleModal = true;
+    },
+
+    // 일정 최종 생성 메소드 (모달에서 완료 버튼 클릭 시)
+    async createFinalSchedule() {
+      try {
+        const response = await apiClient.post('http://localhost:80/enjoytrip/schedule/with-attractions', {
+          scheduleName: this.scheduleForm.scheduleName,
+          startDate: this.scheduleForm.startDate,
+          endDate: this.scheduleForm.endDate,
+          attractions: this.selectedAttractions.map((attraction, index) => ({
+            no: attraction.no,
+            sequenceOrder: index
+          }))
+        });
+
+        if (response.data.code === 'SU') {
+          message.success('일정이 성공적으로 생성되었습니다!');
+          this.router.push(`/schedule/${response.data.scheduleId}/attractions`);
+        }
+      } catch (error) {
+        console.error('일정 생성 실패:', error);
+        message.error('일정 생성에 실패했습니다.');
+      }
+    },
+
+    closeAttractionModal() {
+      this.showAttractionModal = false;
+      this.attractionData = null;
+    },
+
+    // 관광지 추가 메소드 수정
+    addToSchedule() {
+      if (this.attractionData) {
+        this.selectedAttractions.push(this.attractionData);
+        message.success('관광지가 추가되었습니다!');
+      }
+      this.closeAttractionModal();
+    },
+
+    // async finalizeSchedule() {
+    //   try {
+    //     const response = await axios.post('http://localhost:80/enjoytrip/schedule/with-attractions', {
+    //       scheduleId: this.currentScheduleId,
+    //       scheduleName: this.scheduleForm.scheduleName,
+    //       startDate: this.scheduleForm.startDate,
+    //       endDate: this.scheduleForm.endDate,
+    //       attractions: this.selectedAttractions.map((attraction, index) => ({
+    //         contentId: attraction.contentId,
+    //         sequenceOrder: index
+    //       }))
+    //     });
+
+    //     if (response.data.code === 'SU') {
+    //       message.success('일정이 성공적으로 생성되었습니다!');
+    //       this.router.push(`/schedule/${response.data.scheduleId}/attractions`);
+    //     }
+    //   } catch (error) {
+    //     console.error('최종 일정 생성 실패:', error);
+    //     message.error('일정 생성에 실패했습니다.');
+    //   }
+    // },
+
     startDrag(event) {
       if (this.isStarting) return;
       
@@ -218,7 +391,7 @@ export default {
         });
         
         this.attractionData = response.data.attraction;
-        this.showModal = true;
+        this.showAttractionModal = true;
       } catch (error) {
         console.error("서버 요청 실패:", error);
       }
@@ -228,20 +401,6 @@ export default {
       this.showModal = false;
       this.attractionData = null;
     },
-
-    async addToSchedule() {
-      try {
-        await axios.post("http://localhost:80/enjoytrip/schedule/attraction", {
-          contentId: this.attractionData.contentId,
-          scheduleId: 1 // TODO: 실제 일정 ID로 교체 필요
-        });
-        alert("일정에 추가되었습니다!");
-        this.closeModal();
-      } catch (error) {
-        console.error("일정 추가 실패:", error);
-        alert("일정 추가에 실패했습니다.");
-      }
-    }
   },
 
   created() {
@@ -406,4 +565,68 @@ export default {
 .add-button:hover {
   background: #45a049;
 }
+
+.slot-machine-container {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+  padding: 2rem;
+}
+
+.selected-attractions {
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.attractions-list {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.attraction-item {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.attraction-item img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.welcome-modal {
+  text-align: center;
+  padding: 2rem;
+}
+
+.primary-button {
+  background: #1890ff;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.create-schedule-button {
+  width: 100%;
+  padding: 1rem;
+  margin-top: 1rem;
+  background: #1890ff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.create-schedule-button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
 </style>

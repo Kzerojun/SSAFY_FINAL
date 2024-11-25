@@ -12,6 +12,7 @@ import ScheduleAttraction from '@/views/ScheduleAttraction.vue';
 import Notify from "@/views/Notify.vue";
 import Mypage from "@/views/Mypage.vue";
 
+
 const routes = [
   {
     path: '/',
