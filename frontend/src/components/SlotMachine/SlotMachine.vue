@@ -424,27 +424,28 @@ export default {
 </script>
 
 <style scoped>
+/* 슬롯 머신 영역 */
 .slot-machine {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  flex: 0 0 800px; /* 고정 너비 설정 */
+  height: fit-content;
 }
 
 .frame {
   display: flex;
   align-items: flex-start;
-  /*background: linear-gradient(to bottom, #b8860b, #f0e68c);*/
   background-image: url('../../assets/slot-background.jpg');
   padding: 30px;
   border-radius: 15px;
   box-shadow: 0 0 50px rgba(0, 0, 0, 0.7);
   border: 5px solid #f4d03f;
+  min-width: 750px; /* 최소 너비 보장 */
 }
 
 .slots {
   display: flex;
   flex-direction: row;
   gap: 15px;
+  min-width: 600px; /* 슬롯들의 최소 너비 */
 }
 
 .lever-container {
@@ -611,6 +612,10 @@ export default {
   margin: 1rem 0;
 }
 
+.attraction-details {
+  flex: 1;
+}
+
 .info-grid {
   display: grid;
   gap: 1rem;
@@ -640,26 +645,78 @@ export default {
 }
 
 .add-button:hover {
-  background: #45a049;
+  background: #f4d03f;
 }
 
+/* 전체 컨테이너 */
 .slot-machine-container {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
+  display: flex;
   gap: 2rem;
   padding: 2rem;
+  width: 100%;
+  max-width: 1400px;
+  height: 700px;
+  margin: 0 auto;
+  background: none; /* 배경 제거 */
+  border-radius: 15px;
 }
 
+/* 선택된 관광지 목록 영역 */
 .selected-attractions {
-  background: white;
-  padding: 1rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.6); /* 매우 투명한 배경 */
+  backdrop-filter: blur(5px);
+  padding: 1.5rem;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  min-width: 400px;
+  max-width: 500px; /* 최대 너비 제한 */
+  height: 100%;
 }
 
+.selected-attractions h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+
+/* 관광지 목록 스크롤 영역 
+   전체 높이(800px)에서 다음을 제외:
+   - 상하 패딩(2rem * 2 = 64px)
+   - 제목 영역(약 40px)
+   - 하단 버튼(약 56px)
+   - 여유 공간(20px)
+*/
+/* 관광지 목록 스크롤 영역 */
 .attractions-list {
-  max-height: 500px;
+  height: 520px; /* 700px - (패딩 + 제목 + 버튼 높이) */
   overflow-y: auto;
+  margin-bottom: 1rem;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  padding: 0.5rem;
+}
+
+/* 스크롤바 스타일링 */
+.attractions-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.attractions-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.attractions-list::-webkit-scrollbar-thumb {
+  background: #8b5cf6;  /* 보라색 스크롤바 */
+  border-radius: 4px;
+}
+
+.attractions-list::-webkit-scrollbar-thumb:hover {
+  background: #7c3aed;  /* 호버 시 더 진한 보라색 */
 }
 
 .attraction-item {
@@ -667,6 +724,21 @@ export default {
   gap: 1rem;
   padding: 1rem;
   border-bottom: 1px solid #eee;
+  background: white;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 4px;
+}
+
+
+.attraction-item img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.attraction-item:last-child {
+  border-bottom: none;
 }
 
 .attraction-item img {
@@ -682,7 +754,7 @@ export default {
 }
 
 .primary-button {
-  background: #1890ff;
+  background: #f4d03f;
   color: white;
   border: none;
   padding: 0.5rem 1rem;
@@ -690,15 +762,16 @@ export default {
   cursor: pointer;
 }
 
+
+
 .create-schedule-button {
-  width: 100%;
   padding: 1rem;
-  margin-top: 1rem;
-  background: #1890ff;
+  background: #7c3aed;
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  margin-top: auto; /* 버튼을 항상 하단에 고정 */
 }
 
 .create-schedule-button:disabled {

@@ -110,6 +110,11 @@
     padding: 10px;
     font-size: 18px;
   }
+
+  .slot h2 {
+    font-weight: bold;
+    color: #2a0346;
+  }
   
   .slot__window {
     width: 90%;
