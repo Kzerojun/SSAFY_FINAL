@@ -255,6 +255,15 @@ export default {
       this.attractionData = null;
     },
 
+    closeScheduleModal() {
+      this.showScheduleModal = false;
+      this.scheduleForm = {
+        scheduleName: '',
+        startDate: '',
+        endDate: ''
+      };
+    },
+
     // 관광지 추가 메소드 수정
     addToSchedule() {
       if (this.attractionData) {
@@ -492,6 +501,7 @@ export default {
   transform: scale(0.95);
 }
 
+/* 모달 관련 */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -502,18 +512,85 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 9999; /* 더 높은 z-index 값 설정 */
 }
 
 .modal-content {
   background: white;
-  padding: 2rem;
-  border-radius: 8px;
-  max-width: 600px;
-  width: 90%;
-  max-height: 80vh;
-  overflow-y: auto;
-  position: relative;
+  padding: 24px;
+  border-radius: 12px;
+  min-width: 400px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  position: relative; /* position 추가 */
+  z-index: 10000; /* modal-overlay보다 높은 z-index */
+}
+
+.modal-content h2 {
+  margin: 0 0 20px 0;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.modal-buttons button {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.modal-buttons button[type="submit"] {
+  background-color: #f4d03f;
+  color: white;
+  border: none;
+}
+
+.modal-buttons button[type="submit"]:hover {
+  background-color: #f4d03f;
+}
+
+.modal-buttons button[type="button"] {
+  background-color: white;
+  border: 1px solid #d9d9d9;
+  color: #666;
+}
+
+.modal-buttons button[type="button"]:hover {
+  color: #f4d03f;
+  border-color: #f4d03f;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #333;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.3s;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #f4d03f;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
 }
 
 .close-button {
