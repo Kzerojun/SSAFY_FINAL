@@ -36,6 +36,11 @@
 
     <!-- 슬롯 머신 -->
     <div class="slot-machine">
+
+      <!-- 아이콘 추가 -->
+      <div class="slot-machine-header">
+        <img src="@/assets/slotmachine-icon.png" alt="slot machine icon" class="slot-machine-icon">
+      </div>
       <div class="frame">
         <div class="slots">
           <Slot
@@ -399,10 +404,21 @@ export default {
           content: this.slots[2].selectedValue.id,
         });
         
+        if (!response.data.attraction) {
+          // 관광지가 없는 경우
+          message.warning('해당하는 여행지가 없습니다!');
+          this.isStarting = false;
+          return;
+        }
+
+        // 관광지가 있는 경우 기존 로직 실행
         this.attractionData = response.data.attraction;
         this.showAttractionModal = true;
       } catch (error) {
         console.error("서버 요청 실패:", error);
+        message.error('서버 요청에 실패했습니다.');
+      } finally {
+        this.isStarting = false;
       }
     },
 
@@ -424,13 +440,40 @@ export default {
 </script>
 
 <style scoped>
+
+/* 전체 컨테이너 */
+.slot-machine-container {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start; /* 상단 정렬 */
+  position: relative;
+}
+
 /* 슬롯 머신 영역 */
 .slot-machine {
-  flex: 0 0 800px; /* 고정 너비 설정 */
-  height: fit-content;
+  flex: 0 0 800px;
+  position: relative;
+  margin-top: 220px; /* 아이콘 높이만큼 여백 */
+}
+
+.slot-machine-header {
+  position: absolute;
+  bottom: 100%; /* 슬롯 머신의 상단에 딱 맞게 */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+}
+
+.slot-machine-icon { 
+  width: 480px;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.25));
 }
 
 .frame {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: flex-start;
   background-image: url('../../assets/slot-background.jpg');
@@ -438,7 +481,7 @@ export default {
   border-radius: 15px;
   box-shadow: 0 0 50px rgba(0, 0, 0, 0.7);
   border: 5px solid #f4d03f;
-  min-width: 750px; /* 최소 너비 보장 */
+  min-width: 750px;
 }
 
 .slots {
@@ -648,32 +691,20 @@ export default {
   background: #f4d03f;
 }
 
-/* 전체 컨테이너 */
-.slot-machine-container {
-  display: flex;
-  gap: 2rem;
-  padding: 2rem;
-  width: 100%;
-  max-width: 1400px;
-  height: 700px;
-  margin: 0 auto;
-  background: none; /* 배경 제거 */
-  border-radius: 15px;
-}
-
 /* 선택된 관광지 목록 영역 */
 .selected-attractions {
   flex: 1;
   display: flex;
   flex-direction: column;
-  background: rgba(255, 255, 255, 0.6); /* 매우 투명한 배경 */
-  backdrop-filter: blur(5px);
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(3px);
   padding: 1.5rem;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   min-width: 400px;
-  max-width: 500px; /* 최대 너비 제한 */
-  height: 100%;
+  max-width: 500px;
+  margin-top: 0; /* 아이콘과 같은 높이에서 시작 */
+  height: calc(100% + 220px); /* 슬롯 머신 높이 + 아이콘 높이 */
 }
 
 .selected-attractions h3 {
