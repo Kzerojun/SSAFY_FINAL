@@ -1,10 +1,9 @@
 package com.enjoytrip.user.model.mapper;
 
+import com.enjoytrip.user.model.dto.UserDto;
 import java.sql.SQLException;
 
 import org.apache.ibatis.annotations.Mapper;
-
-import com.enjoytrip.user.model.dto.UserDto;
 
 @Mapper
 public interface UserMapper {
@@ -20,5 +19,7 @@ public interface UserMapper {
 	UserDto getUserProfile(int userNo) throws SQLException;
 
 	UserDto getUserByEmail(String email) throws SQLException;
+
+	void updateProfileImage(String userEmail, String profileImage) throws SQLException;
 
 }

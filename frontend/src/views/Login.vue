@@ -122,7 +122,7 @@ export default defineComponent({
 
         if (response.status === 200) {
 
-          message.success(`강원랜트에 오신거 환영합니다.`);
+          message.success(`강원랜트에 오신 것을 환영합니다.`);
           authStore.setAccessToken(response.data.accessToken);
 
           setTimeout(() => {

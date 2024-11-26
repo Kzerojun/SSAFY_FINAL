@@ -100,14 +100,20 @@
   .slot {
     width: 220px;
     height: 220px;
-    background-color: #32CD32;
-    border: 3px solid #8A2BE2;
+    background-color: orange;
+    border: 3px solid #f4d03f;
     border-radius: 15px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
     display: flex;
     flex-direction: column;
     align-items: center;
     padding: 10px;
+    font-size: 18px;
+  }
+
+  .slot h2 {
+    font-weight: bold;
+    color: #2a0346;
   }
   
   .slot__window {

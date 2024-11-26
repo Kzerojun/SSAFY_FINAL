@@ -3,12 +3,13 @@
   <div id="app">
     <Header /> <!-- Header 컴포넌트를 렌더링합니다 -->
     <router-view /> <!-- 이 부분은 라우팅이 있을 경우에만 필요합니다 -->
+    <ChatBot/>
   </div>
 </template>
 
 <script lang="ts" setup>
 import Header from './components/Header.vue';
-import MainSearch from "@/views/Travel.vue";
+import ChatBot from "@/components/Chatbot.vue";
 </script>
 
 <style>
@@ -20,6 +21,6 @@ import MainSearch from "@/views/Travel.vue";
 }
 
 body {
-  font-family: 'Danjo-bold-Regular', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 </style>

@@ -1,12 +1,11 @@
 package com.enjoytrip.user.model.service;
 
+import com.enjoytrip.user.model.dto.UserDto;
 import java.sql.SQLException;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.enjoytrip.user.model.dto.UserDto;
 import com.enjoytrip.user.model.mapper.UserMapper;
 
 @Service
@@ -47,6 +46,11 @@ public class UserServiceImpl implements UserService{
 	@Override
 	public UserDto getUserProfile(int userNo) throws SQLException {
 		return this.userMapper.getUserProfile(userNo);
+	}
+
+	@Override
+	public void updateProfileImage(String userEmail, String profileImage) throws SQLException {
+			userMapper.updateProfileImage(userEmail, profileImage);
 	}
 
 //	@Override

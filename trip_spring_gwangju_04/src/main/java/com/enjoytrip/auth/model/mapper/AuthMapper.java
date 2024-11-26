@@ -5,7 +5,6 @@ import com.enjoytrip.auth.dto.request.DeactivateRequest;
 import com.enjoytrip.auth.dto.request.LoginRequest;
 import com.enjoytrip.user.model.dto.UserDto;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.Optional;
 
