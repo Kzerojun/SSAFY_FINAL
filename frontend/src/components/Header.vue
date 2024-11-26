@@ -12,9 +12,11 @@
     <div class="center-section">
       <div class="custom-search-bar">
         <input
-            type="text"
-            class="search-input"
-            placeholder="여행 떠나고, 잭팟 뽑자!"
+          type="text"
+          class="search-input"
+          placeholder="여행 떠나고, 잭팟 뽑자!"
+          v-model="searchText"
+          @input="handleSearch"
         />
         <button class="search-button">
           <svg
@@ -46,7 +48,8 @@
       </nav>
     </div>
 
-
+    <!-- CoinRain 컴포넌트 추가 -->
+    <CoinRain :is-active="showCoinRain" />
   </a-layout-header>
 </template>
 
@@ -56,10 +59,14 @@ import { UserOutlined,NotificationOutlined } from '@ant-design/icons-vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth'; // Pinia Auth Store import
 import UserMenu from "@/components/UserMenu.vue";
-import {computed} from "vue";
+import { computed, ref } from "vue";
+import CoinRain from './CoinRain.vue';
 
 // Ant Design 컴포넌트 명시적 등록
 const ALayoutHeader = Layout.Header;
+const searchText = ref('');
+const showCoinRain = ref(false);
+const secretCode = '4반 사랑해'; // 시크릿 코드 설정
 
 const router = useRouter();
 
@@ -92,7 +99,17 @@ const authStore = useAuthStore();
 // 로그인 상태 확인 (accessToken 존재 여부)
 const isLoggedIn = computed(() => authStore.accessToken !== null);
 
-
+const handleSearch = () => {
+  if (searchText.value.toLowerCase() === secretCode) {
+    showCoinRain.value = true;
+    
+    // 10초 후 애니메이션 종료 및 정리
+    setTimeout(() => {
+      showCoinRain.value = false;
+      searchText.value = '';
+    }, 10000);
+  }
+};
 </script>
 
 <style scoped>
